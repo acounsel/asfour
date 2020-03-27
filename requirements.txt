@@ -6,4 +6,4 @@ django-heroku
 django-import-export
 django-storages
 gunicorn
-Twill
+twilio
