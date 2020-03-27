@@ -1,0 +1,65 @@
+{% load static %}
+{% load admin_urls %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" href="{% url 'home' %}"><i class="fas fa-comments mr-2"></i>Asfour</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse navbar-expand-xlg" id="navbarNav">
+    <ul class="navbar-nav w-100">
+      <li class="nav-item dropdown mr-3">
+        <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Contacts
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" href="{% url 'contact-list' %}">View Contacts</a>
+          <a class="dropdown-item" href="{% url 'contact-create' %}">Add Contact</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown mr-3">
+        <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Messages
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" href="{% url 'message-list' %}">View Messages</a>
+          <a class="dropdown-item" href="{% url 'message-create' %}">Add Message</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown mr-auto">
+        <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Responses
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" href="{% url 'response-list' %}">View Response</a>
+        </div>
+      </li>
+     <!--  <li class="nav-item dropdown mr-auto">
+        <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Surveys
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" href="">View Surveys</a>
+          <a class="dropdown-item" href="">Add Survey</a>
+        </div>
+      </li> -->
+      <li class="nav-item dropdown">
+        {% if request.user.is_authenticated %}
+        <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <span class="UserIcon mr-3 text-white"><i class="far fa-user"></i></span>{{ request.user.first_name }}
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="#">Settings</a>
+          <a class="dropdown-item" href="#">Organization</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+          </div>
+        {% else %}
+        <a class="nav-link text-white" href="{% url 'login' %}">Login</a>
+        {% endif %}
+        
+      </li>
+    </ul>
+    
+
+  </div>
+</nav>

@@ -1,0 +1,7 @@
+{% load crispy_forms_tags %}
+<form class="mt-5 w-50" method="POST" novalidate>
+  {% csrf_token %}
+  {{ form|crispy }}
+  {{ form.errors  }}
+  <input type="submit" value="Submit" class="btn btn-primary px-4">
+</form>

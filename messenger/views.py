@@ -1,0 +1,109 @@
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect, render
+from django.views.generic import View, DetailView, ListView
+from django.views.generic.edit import CreateView, UpdateView
+from django.urls import reverse, reverse_lazy
+
+from .models import Organization, UserProfile, Contact
+from .models import Message, Response
+
+class LoginRequiredMixin(LoginRequiredMixin):
+
+    def get_profile(self):
+        return self.request.user.userprofile
+
+    def get_org(self):
+        return self.get_profile().organization
+
+class Home(View):
+    pass
+
+class OrgListView(LoginRequiredMixin, ListView):
+
+    def get_queryset(self):
+        queryset = super(OrgListView, self).get_queryset()
+        organization = self.get_org()
+        return queryset.filter(organization=organization)
+
+class OrgDetailView(LoginRequiredMixin, DetailView):
+
+    def get_queryset(self):
+        queryset = super(OrgDetailView, self).get_queryset()
+        organization = self.get_org()
+        return queryset.filter(organization=organization)
+
+class OrgCreateView(LoginRequiredMixin, CreateView):
+
+    def form_valid(self, form):
+        form.instance.organization = self.get_org()
+        messages.success(
+            self.request,
+            '{} Created'.format(
+                form.instance._meta.verbose_name.title()
+            )
+        )
+        # response = super().form_valid(form)
+        return super().form_valid(form)
+
+class OrgUpdateView(LoginRequiredMixin, UpdateView):
+
+    def form_valid(self, form):
+        form.instance.organization = self.get_org()
+        messages.success(
+            self.request,
+            '{} Created'.format(
+                form.instance._meta.verbose_name.title()
+            )
+        )
+        return super().form_valid(form)
+
+class ContactView(View):
+    model = Contact
+    fields = ('first_name', 'last_name', 'phone', 'email',
+        'preferred_method', 'has_whatsapp')
+    success_url = reverse_lazy('contact-list')
+
+class ContactList(ContactView, OrgListView):
+    pass
+
+class ContactDetail(ContactView, OrgDetailView):
+    pass
+
+class ContactCreate(ContactView, OrgCreateView):
+    pass
+
+class ContactUpdate(ContactView, OrgUpdateView):
+    pass
+
+class MessageView(View):
+    model = Message
+    fields = ('body', 'attachment', 'contacts')
+
+class MessageList(MessageView, OrgListView):
+    pass
+
+class MessageDetail(MessageView, OrgDetailView):
+    pass
+
+class MessageCreate(MessageView, OrgCreateView):
+    pass
+
+class MessageUpdate(MessageView, OrgUpdateView):
+    pass
+
+class MessageSend(MessageDetail):
+
+    def get(self, request, **kwargs):
+        response = super().get(request, **kwargs)
+        context = self.get_context_data(**kwargs)
+        message = self.get_object()
+        message.send()
+        return redirect(reverse('home'))
+
+class ResponseView(View):
+    model = Response
+
+class ResponseList(ResponseView, ListView):
+    pass
+

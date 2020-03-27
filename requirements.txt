@@ -1,0 +1,9 @@
+Boto3
+django
+django-crispy-forms
+django-extensions
+django-heroku
+django-import-export
+django-storages
+gunicorn
+Twill

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block body %}
+  <div class="container-fluid">
+    <div class="card mx-auto mt-5 p-4 w-50">
+      <h2>Login</h2>
+      <form class="Form mt-4" method="post">
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="form-group row align-items-center">
+            <label for="{{ field.name }}" class="col-sm-4 col-form-label">{{ field.label }}</label>
+            <div class="col-sm-8">
+              {{ field }}
+            </div>
+              {% if field.errors %}
+              {{ field.errors }}
+              {% endif %}
+          </div>
+        {% endfor %}
+        <div class="form-group row align-items-center">
+          <div class="col-sm-4 mx-auto mt-5">
+            <button type="submit" class="btn btn-primary btn-login btn-block">Login</button>
+          </div>
+        </div>
+      </form>
+  </div>
+{% endblock %}
