@@ -5,6 +5,7 @@ from django.views.generic import View, DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView
 from django.urls import reverse, reverse_lazy
 
+from twilio.twiml.messaging_response import MessagingResponse
 from .models import Organization, UserProfile, Contact
 from .models import Message, Response
 
@@ -110,3 +111,12 @@ class ResponseView(View):
 class ResponseList(ResponseView, ListView):
     pass
 
+class HarvestResponse(View):
+
+    def post(self, request, **kwargs):
+        body = request.values.get('Body', None)
+        print(body)
+        print(request.values)
+        resp = MessagingResponse()
+        resp.message('Thank you for your message')
+        return str(resp)

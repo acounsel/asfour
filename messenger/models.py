@@ -85,12 +85,12 @@ class Message(models.Model):
         account_sid, auth_token, phone = self.organization \
         .get_credentials()
         client = Client(account_sid, auth_token)
+        kwargs = {'body':self.body,'from_':phone,}
+        if self.attachment:
+            kwargs['media_url'] = [self.attachment.url]
         for contact in self.contacts.all():
-            message = client.messages.create(
-                body=self.body,
-                to=contact.phone,
-                from_=phone
-            )
+            kwargs['to'] = contact.phone
+            message = client.messages.create(**kwargs)
         return True
 
 class Response(models.Model):

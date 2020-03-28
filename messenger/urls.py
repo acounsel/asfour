@@ -23,6 +23,7 @@ urlpatterns = [
             path('send/', views.MessageSend.as_view(), name='message-send'),
         ])),
     ])),
+    path('response/<int:pk>/', views.HarvestResponse.as_view(), name='harvest-response'),
     path('responses/', include([
         path('', views.ResponseList.as_view(), name='response-list'),
     ])),
