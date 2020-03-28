@@ -125,15 +125,15 @@ class ResponseList(ResponseView, ListView):
 class HarvestResponse(View):
 
     def post(self, request, **kwargs):
-        body = self.request.values.get('Body', None)
+        body = request.POST.get('Body', None)
         print(body)
-        print(self.request.values)
+        print(request.POST)
         organization = Organization.objects.get(
             id=self.kwargs.get('pk'))
         response = Response.objects.create(
             body=body,
-            phone=self.request.values.get('from_'),
-            sid=self.request.values.get('sid'),
+            phone=request.POST.get('from_'),
+            sid=request.POST.get('sid'),
             organization=organization,
         )
         resp = MessagingResponse()
