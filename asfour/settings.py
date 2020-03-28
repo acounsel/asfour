@@ -100,8 +100,13 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 try:
     from .local_settings import *
 except Exception as e:
-    print(e)
-    pass
-
+    AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = os.environ.get('S3_BUCKET')
+    AWS_S3_CUSTOM_DOMAIN = '{}.s3.amazonaws.com'.format(AWS_STORAGE_BUCKET_NAME)
+    AWS_PUBLIC_MEDIA_LOCATION = 'media/public'
+    DEFAULT_FILE_STORAGE = 'zwazo.storage_backends.PublicMediaStorage'
+    AWS_PRIVATE_MEDIA_LOCATION = 'media/private'
+    PRIVATE_FILE_STORAGE = 'zwazo.storage_backends.PrivateMediaStorage'
 # Activate Django-Heroku.
 django_heroku.settings(locals())

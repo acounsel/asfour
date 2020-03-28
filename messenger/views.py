@@ -136,4 +136,4 @@ class HarvestResponse(View):
         )
         resp = MessagingResponse()
         resp.message('Thank you for your message')
-        return resp
+        return HttpResponse(str(resp))
