@@ -12,8 +12,7 @@ def validate_twilio_request(f):
     @wraps(f)
     def decorated_function(request, *args, **kwargs):
         # Create an instance of the RequestValidator class
-        org = Organization.objects.get(
-            id=self.kwargs.get('pk'))
+        org = Organization.objects.get(id=kwargs.get('pk'))
         validator = RequestValidator(org.twilio_secret)
 
         # Validate the request using its URL, POST data,
