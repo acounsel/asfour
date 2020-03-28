@@ -133,7 +133,7 @@ class HarvestResponse(View):
         response = Response.objects.create(
             body=body,
             phone=request.POST.get('from_'),
-            sid=request.POST.get('sid'),
+            sid=request.POST.get('MessageSid'),
             organization=organization,
         )
         resp = MessagingResponse()
