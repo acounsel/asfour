@@ -126,11 +126,9 @@ class HarvestResponse(View):
 
     def post(self, request, **kwargs):
         body = request.POST.get('Body', None)
-        print(body)
-        print(request.POST)
         organization = Organization.objects.get(
             id=self.kwargs.get('pk'))
-        response = Response.objects.create(
+        Response.objects.create(
             body=body,
             phone=request.POST.get('From'),
             sid=request.POST.get('MessageSid'),
@@ -138,4 +136,4 @@ class HarvestResponse(View):
         )
         resp = MessagingResponse()
         resp.message('Thank you for your message')
-        return str(resp)
+        return resp
