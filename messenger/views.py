@@ -132,7 +132,7 @@ class HarvestResponse(View):
             id=self.kwargs.get('pk'))
         response = Response.objects.create(
             body=body,
-            phone=request.POST.get('from_'),
+            phone=request.POST.get('From'),
             sid=request.POST.get('MessageSid'),
             organization=organization,
         )
