@@ -14,6 +14,8 @@ INSTALLED_APPS = [
     'messenger',
 ]
 
+DEBUG = True
+
 ALLOWED_HOSTS = ['0.0.0.0', 'localhost']
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
