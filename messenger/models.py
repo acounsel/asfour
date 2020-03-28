@@ -97,8 +97,10 @@ class Response(models.Model):
 
     contact = models.ForeignKey(Contact, 
         on_delete=models.SET_NULL, blank=True, null=True)
+    phone = models.CharField(max_length=100, blank=True)
     body = models.TextField(blank=True)
-    call_sid = models.CharField(max_length=255)
+    sid = models.CharField(max_length=255)
+    date_received = models.DateTimeField(auto_now_add=True)
     organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE)
 

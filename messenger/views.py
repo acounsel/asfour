@@ -1,13 +1,23 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.views.generic import View, DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView
 from django.urls import reverse, reverse_lazy
+from django.utils.decorators import method_decorator
 
+from twilio.twiml.voice_response import VoiceResponse
 from twilio.twiml.messaging_response import MessagingResponse
+from .decorators import validate_twilio_request
 from .models import Organization, UserProfile, Contact
 from .models import Message, Response
+
+decorators = [
+    csrf_exempt, require_POST, validate_twilio_request
+]
 
 class LoginRequiredMixin(LoginRequiredMixin):
 
@@ -111,12 +121,21 @@ class ResponseView(View):
 class ResponseList(ResponseView, ListView):
     pass
 
+@method_decorator(decorators, name='dispatch')
 class HarvestResponse(View):
 
     def post(self, request, **kwargs):
         body = request.values.get('Body', None)
         print(body)
         print(request.values)
+        organization = Organizatoin.objects.get(
+            id=self.kwargs.get('pk'))
+        response = Response.objects.create(
+            body=body,
+            phone=request.values.get('from_'),
+            sid=request.values.get('sid'),
+            organization=organization,
+        )
         resp = MessagingResponse()
         resp.message('Thank you for your message')
         return str(resp)
