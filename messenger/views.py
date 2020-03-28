@@ -17,7 +17,10 @@ class LoginRequiredMixin(LoginRequiredMixin):
         return self.get_profile().organization
 
 class Home(View):
-    pass
+    template_name = 'home.html'
+
+    def get(self, request, **kwargs):
+        return render(request, self.template_name)
 
 class OrgListView(LoginRequiredMixin, ListView):
 
