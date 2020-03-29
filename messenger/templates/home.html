@@ -28,7 +28,7 @@
               </div>
               <div>
                 <h5 class="card-title">Contacts</h5>
-                <p class="card-text">You have {{ contact_count|default:"no" }} contacts</p>
+                <p class="card-text">You have {{ contact_list.count|default:"no" }} contacts</p>
               </div>
             </div>
           </div>
@@ -46,7 +46,7 @@
               </div>
               <div>
                 <h5 class="card-title">Messages</h5>
-                <p class="card-text">You have {{ message_count|default:"no" }} message templates</p>
+                <p class="card-text">You have {{ message_list.count|default:"no" }} message templates</p>
               </div>
             </div>
           </div>
@@ -64,7 +64,7 @@
               </div>
               <div>
                 <h5 class="card-title">Responses</h5>
-                <p class="card-text">You have {{ response_count|default:"no" }} responses</p>
+                <p class="card-text">You have {{ response_list.count|default:"no" }} responses</p>
               </div>
             </div>
           </div>
@@ -83,7 +83,7 @@
     <input type="text" name="name" placeholder="Name" class="form-control mb-4">
     <input type="email" name="email" placeholder="Email" class="form-control mb-4">
     <textarea name="body" placeholder="What Do You Plan to Use it For?" class="form-control mb-4"></textarea>
-    <input type="submit" value="Submit" class="btn btn-primary px-4">
+    <input type="submit" value="Submit" class="btn btn-danger px-4">
   </form>
 </div>
 {% endblock %}

@@ -17,14 +17,39 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-footable/3.1.6/footable.min.js"></script>
     <script type="text/javascript" src="{% static 'js/footable.min.js' %}"></script>
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <!-- <style>
-      body {
-        background-color: #27241D;
+    <style>
+      .Messages {
+        position: relative;
+        width: 100%;
+        z-index: 100000;
       }
-    </style> -->
+      .Message {
+          position: absolute;
+          top: 0;
+          left: 50%;
+          width: 500px;
+          margin-left: -250px;
+          padding: 10px;
+          text-align: center;
+          border-radius: 0 0 4px 4px
+      }
+        .Messages .error {
+            color: #fff;
+            background-color: #F78181;
+        }
+        .Messages .success {
+            color: #FFFFFF;
+            background-color: #3DBD89;
+            cursor: pointer;
+        }
+        .Messages.hide {
+            display: none;
+        }
+    </style>
   </head>
   <body>
     <header>
+      {% include 'addins/messages.html' %}
       {% include 'addins/navbar.html' %}
       {% block header %}
       {% endblock %}
@@ -39,7 +64,15 @@
     </main>
     <footer>
     </footer>
-    <script>
+    <script type="text/javascript">
+      setTimeout(function() {
+        $('.Message').fadeOut('slow');
+      }, 3000);
+      $('.Message').click(function() {
+        $('.Message').fadeOut("slow");
+      });
+    </script>
+    <script type="text/javascript">
       $( '.table' ).footable();
     </script>
     <footer class="footer bg-dark py-5">

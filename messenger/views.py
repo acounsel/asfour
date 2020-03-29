@@ -34,13 +34,16 @@ class Home(View):
     template_name = 'home.html'
 
     def get_context_data(self, **kwargs):
-        org = self.request.user.userprofile.organization
-        kwargs = {'organization': org,}
-        context = {
-            'contacts': Contact.objects.filter(**kwargs),
-            'messages': Message.objects.filter(**kwargs),
-            'respones': Response.objects.filter(**kwargs),
-        }
+        if hasattr(self.request.user, 'userprofile'):
+            org = self.request.user.userprofile.organization
+            kwargs = {'organization': org,}
+            context = {
+                'contact_list': Contact.objects.filter(**kwargs),
+                'message_list': Message.objects.filter(**kwargs),
+                'respone_list': Response.objects.filter(**kwargs),
+            }
+        else:
+            context = {}
         return context
 
     def get(self, request, **kwargs):
@@ -58,6 +61,8 @@ class Home(View):
                 request.POST.get('body')
             )
         )
+        messages.success(request, 
+            'Request Received, Thank You!')
         return render(request, self.template_name, context)
 
 class OrgListView(LoginRequiredMixin, ListView):
