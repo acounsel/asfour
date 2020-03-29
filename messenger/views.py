@@ -9,11 +9,14 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 
-from twilio.twiml.voice_response import VoiceResponse
-from twilio.twiml.messaging_response import MessagingResponse
 from .decorators import validate_twilio_request
+from .functions import send_email
 from .models import Organization, UserProfile, Contact
 from .models import Message, Response
+
+from twilio.twiml.voice_response import VoiceResponse
+from twilio.twiml.messaging_response import MessagingResponse
+
 
 decorators = [
     csrf_exempt, require_POST, validate_twilio_request
@@ -30,8 +33,32 @@ class LoginRequiredMixin(LoginRequiredMixin):
 class Home(View):
     template_name = 'home.html'
 
+    def get_context_data(self, **kwargs):
+        org = self.request.user.userprofile.organization
+        kwargs = {'organization': org,}
+        context = {
+            'contacts': Contact.objects.filter(**kwargs),
+            'messages': Message.objects.filter(**kwargs),
+            'respones': Response.objects.filter(**kwargs),
+        }
+        return context
+
     def get(self, request, **kwargs):
-        return render(request, self.template_name)
+        context = self.get_context_data()
+        return render(request, self.template_name, context)
+
+    def post(self, request, **kwargs):
+        context = self.get_context_data()
+        email = send_email(
+            to='sarrabi@gmail.com',
+            subject='Account Requested',
+            content='{0} ({1}): {2}'.format(
+                request.POST.get('name'),
+                request.POST.get('email'),
+                request.POST.get('body')
+            )
+        )
+        return render(request, self.template_name, context)
 
 class OrgListView(LoginRequiredMixin, ListView):
 
