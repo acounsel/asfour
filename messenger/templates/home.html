@@ -1,5 +1,39 @@
 {% extends 'base.html' %}
 
 {% block body %}
-Welcome to asfour or whatever!
+<div class="d-flex justify-content-between">
+  <div class="w-25">
+    <div style="border-radius:.75rem;" class="card">
+      <div class="card-body">
+        <h5 class="card-title">Contacts</h5>
+        <p class="card-text">You have {{ contact_count|default:"no" }} contacts</p>
+      </div>
+      <div style="border-radius:0 0 .75rem .75rem;" class="card-footer">
+        <p class="text-center mb-0">Add Contact<i class="fas fa-angle-right pl-1"></i></p>
+      </div>
+    </div>
+  </div>
+  <div class="w-25">
+    <div style="border-radius:.75rem;" class="card">
+      <div class="card-body">
+        <h5 class="card-title">Messages</h5>
+        <p class="card-text">You have {{ message_count|default:"no" }} messages</p>
+      </div>
+      <div style="border-radius:0 0 .75em .75rem;" class="card-footer">
+        <p class="text-center mb-0">Add Message<i class="fas fa-angle-right pl-1"></i></p>
+      </div>
+    </div>
+  </div>
+  <div class="w-25">
+    <div style="border-radius:.75rem;" class="card">
+      <div class="card-body">
+        <h5 class="card-title">Responses</h5>
+        <p class="card-text">You have {{ response_count|default:"no" }} responses</p>
+      </div>
+      <div style="border-radius:0 0 .75rem .75rem;" class="card-footer">
+        <p class="text-center mb-0">Send Message<i class="fas fa-angle-right pl-1"></i></p>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
