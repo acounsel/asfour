@@ -1,39 +1,89 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
 
-{% block body %}
-<div class="d-flex justify-content-between">
-  <div class="w-25">
-    <div style="border-radius:.75rem;" class="card">
-      <div class="card-body">
-        <h5 class="card-title">Contacts</h5>
-        <p class="card-text">You have {{ contact_count|default:"no" }} contacts</p>
+{% block header %}
+<div class="Hero" style="height:600px;width:100vw;background:black;overflow:hidden;background:#BA2525;background:-webkit-linear-gradient(rgba(29, 38, 113, 0.8), rgba(195, 55, 100, 0.8)),url('https://saraabi-assets.s3.amazonaws.com/aroc_dabke.jpg');background: linear-gradient(rgba(29, 38, 113, 0.8), rgba(186, 37, 37, 0.8)), url('https://saraabi-assets.s3.amazonaws.com/aroc_dabke.jpg');background-attachment:fixed;background-repeat:no-repeat;background-size:cover;"> 
+  <section style="height:100%" class='hero-header-text'>
+    <div style="height:93%;display:flex;justify-content:center;align-items:center;flex-direction:column">
+    <h1 style="font-size: 90px;font-family:'Montserrat';font-weight:100;" class="text-white text-center">ASFOUR</h1>
+    <h2 style="font-family:'Montserrat';font-weight:120;" class="text-white text-center pb-5">Some sort of explanatory text</h2>
+    <button class="btn btn-outline-light btn-lg">Send Message</button>
+    </div>
+    <p class="pt-auto ml-auto w-25"><a href="https://www.facebook.com/movementphotographer/" class="text-white">Photo Credit: Brooke Anderson</a></p>
+  </section>
+</div>
+{% endblock %}
+{% block main %}
+<!-- <div style="background-color:#27241D" class="w-100"> -->
+<div class="w-100 bg-dark pb-5">
+  <div class="w-75 mx-auto py-5">
+    <h3 style="font-family:'Montserrat';font-size:2.5rem;font-weight:200;" class="pb-5 text-white text-center">Some header text here too</h3>
+    <div class="d-flex justify-content-between">
+      <div class="w-25">
+        <div style="border-radius:.75rem;" class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="Icons">
+                <i class="fas fa-address-book fa-3x pr-4"></i>
+              </div>
+              <div>
+                <h5 class="card-title">Contacts</h5>
+                <p class="card-text">You have {{ contact_count|default:"no" }} contacts</p>
+              </div>
+            </div>
+          </div>
+          <div style="border-radius:0 0 .75rem .75rem;" class="card-footer">
+            <a href="{% url 'contact-create' %}" class="d-block text-dark text-center mb-0">Add Contact<i class="fas fa-angle-right pl-1"></i></a>
+          </div>
+        </div>
       </div>
-      <div style="border-radius:0 0 .75rem .75rem;" class="card-footer">
-        <p class="text-center mb-0">Add Contact<i class="fas fa-angle-right pl-1"></i></p>
+      <div class="w-25">
+        <div style="border-radius:.75rem;" class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="Icons">
+                <i class="fas fa-comments fa-3x pr-4"></i>
+              </div>
+              <div>
+                <h5 class="card-title">Messages</h5>
+                <p class="card-text">You have {{ message_count|default:"no" }} message templates</p>
+              </div>
+            </div>
+          </div>
+          <div style="border-radius:0 0 .75em .75rem;" class="card-footer">
+            <a href="{% url 'message-create' %}" class="d-block text-dark text-center mb-0">Create Message<i class="fas fa-angle-right pl-1"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="w-25">
+        <div style="border-radius:.75rem;" class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="Icons">
+                <i class="fas fa-reply-all fa-3x pr-4"></i>
+              </div>
+              <div>
+                <h5 class="card-title">Responses</h5>
+                <p class="card-text">You have {{ response_count|default:"no" }} responses</p>
+              </div>
+            </div>
+          </div>
+          <div style="border-radius:0 0 .75rem .75rem;" class="card-footer">
+            <a href="{% url 'message-list' %}" class="d-block text-dark text-center mb-0">Send Message<i class="fas fa-angle-right pl-1"></i></a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-  <div class="w-25">
-    <div style="border-radius:.75rem;" class="card">
-      <div class="card-body">
-        <h5 class="card-title">Messages</h5>
-        <p class="card-text">You have {{ message_count|default:"no" }} messages</p>
-      </div>
-      <div style="border-radius:0 0 .75em .75rem;" class="card-footer">
-        <p class="text-center mb-0">Add Message<i class="fas fa-angle-right pl-1"></i></p>
-      </div>
-    </div>
-  </div>
-  <div class="w-25">
-    <div style="border-radius:.75rem;" class="card">
-      <div class="card-body">
-        <h5 class="card-title">Responses</h5>
-        <p class="card-text">You have {{ response_count|default:"no" }} responses</p>
-      </div>
-      <div style="border-radius:0 0 .75rem .75rem;" class="card-footer">
-        <p class="text-center mb-0">Send Message<i class="fas fa-angle-right pl-1"></i></p>
-      </div>
-    </div>
-  </div>
+</div>
+<div class="py-5 bg-light w-100">
+  <h3 style="font-family:'Montserrat';font-size:2.5rem;font-weight:200;" class="pb-5 text-dark text-center">Sign Up To Request Access</h3>
+  <form style="max-width:500px;" class="w-50 mx-auto" method="POST">
+    {% csrf_token %}
+    <input type="text" name="name" placeholder="Name" class="form-control mb-4">
+    <input type="email" name="email" placeholder="Email" class="form-control mb-4">
+    <textarea name="body" placeholder="What Do You Plan to Use it For?" class="form-control mb-4"></textarea>
+    <input type="submit" value="Submit" class="btn btn-primary px-4">
+  </form>
 </div>
 {% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="d-flex justify-content-between">
+  <h1>Response List</h1>
+  <h2><a href=""><i class="fas fa-download pr-4"></i></a></h2>
+</div>
+<div class="card mt-5">
+  <table class="table" data-sorting="true">
+    <thead>
+      <tr>
+        <th scope="col">Text</th>
+        <th scope="col">Phone Number</th>
+        <th scope="col">Date Received</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for response in response_list %}
+      <tr>
+        <th scope="row"><a href="{{ response.get_absolute_url }}">{{ response.body }}</a></th>
+        <td>{{ response.phone }}</td>
+        <td>{{ response.date_received }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

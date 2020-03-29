@@ -17,34 +17,35 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-footable/3.1.6/footable.min.js"></script>
     <script type="text/javascript" src="{% static 'js/footable.min.js' %}"></script>
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <style>
+    <!-- <style>
       body {
-        background-color: #FAFBFC;
+        background-color: #27241D;
       }
-    </style>
+    </style> -->
   </head>
   <body>
     <header>
       {% include 'addins/navbar.html' %}
-      <div class="Hero" style="height:600px;width:100vw;background:black;overflow:hidden;background:#BA2525;background:-webkit-linear-gradient(rgba(29, 38, 113, 0.8), rgba(195, 55, 100, 0.8)),url('https://saraabi-assets.s3.amazonaws.com/aroc_dabke.jpg');background: linear-gradient(rgba(29, 38, 113, 0.8), rgba(195, 55, 100, 0.8)), url('https://saraabi-assets.s3.amazonaws.com/aroc_dabke.jpg');background-attachment:fixed;background-repeat:no-repeat;background-size:cover;"> 
-        <section style="height:100%" class='hero-header-text'>
-          <div style="height:93%;display:flex;justify-content:center;align-items:center;flex-direction:column">
-          <h1 style="font-size: 90px;font-family:'Montserrat';font-weight:100;" class="text-white text-center">ASFOUR</h1>
-          <h2 style="font-family:'Montserrat';font-weight:120;" class="text-white text-center pb-5">Some sort of explanatory text</h2>
-          <button class="btn btn-outline-light btn-lg">Send Message</button>
-          </div>
-          <p class="pt-auto ml-auto w-25"><a href="https://www.facebook.com/movementphotographer/" class="text-white">Photo Credit: Brooke Anderson</a></p>
-        </section>
-      </div>
-    </header>
-    <main>
-      <div class="py-5 w-75 w-100-r mx-auto mb-5">
-      {% block body %}
+      {% block header %}
       {% endblock %}
-      </div>
+    </header>
+    <main style="min-height: 700px;">
+      {% block main %}
+        <div class="py-5 w-75 w-100-r mx-auto mb-5">
+        {% block body %}
+        {% endblock %}
+        </div>
+      {% endblock %}
     </main>
+    <footer>
+    </footer>
     <script>
       $( '.table' ).footable();
     </script>
+    <footer class="footer bg-dark py-5">
+      <div class="container">
+        <div class="text-muted text-center mx-auto">© 2020 Copyright: <strong><a class="text-muted" href="http://araborganizing.org/">Arab Resource &amp; Organizing Center</a></strong></div>
+      </div>
+    </footer>
   </body>
 </html>
