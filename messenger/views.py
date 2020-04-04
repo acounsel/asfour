@@ -144,13 +144,13 @@ class MessageSend(MessageDetail):
         response = super().get(request, **kwargs)
         context = self.get_context_data(**kwargs)
         message = self.get_object()
-        message.send()
+        message.send(request)
         return redirect(reverse('home'))
 
 class ResponseView(View):
     model = Response
 
-class ResponseList(ResponseView, ListView):
+class ResponseList(ResponseView, OrgListView):
     pass
 
 @method_decorator(decorators, name='dispatch')
@@ -160,12 +160,13 @@ class HarvestResponse(View):
         body = request.POST.get('Body', None)
         organization = Organization.objects.get(
             id=self.kwargs.get('pk'))
-        Response.objects.create(
+        response = Response.objects.create(
             body=body,
             phone=request.POST.get('From'),
             sid=request.POST.get('MessageSid'),
             organization=organization,
         )
+        response.find_contact()
         resp = MessagingResponse()
         resp.message('Thank you for your message')
         return HttpResponse(str(resp))

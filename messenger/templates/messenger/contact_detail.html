@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block body %}
+<h1>Contact</h1>
+<div class="card p-4">
+  <h2>{{ contact.first_name }} {{ contact.last_name }}</h2>
+  <p><a href="{% url 'contact-update' pk=contact.id %}">Edit</a></p>
+  <h3>Contact Info</h3>
+  <p><strong>Email: </strong>{{ contact.email }}</p>
+  <p><strong>Phone: </strong>{{ contact.phone }}</p>
+  <p><strong>Address: </strong>{{ contact.get_address }}</p>
+  <p><strong>Has WhatsApp: </strong>{{ contact.has_whatsapp }}</p>
+  <p><strong>Preferred Communication Method: </strong>{{ contact.get_preferred_method_display }}</p>
+  <h3>History</h3>
+  <h4>Messages Sent</h4>
+  {% for message in contact.messagelog_set.all %}
+  <p><strong><a href="{{ message.message.get_absolute_url }}">{{ message.date }}</a>: </strong>{{ message.message.body }}</p>
+  {% endfor %}
+  <h4>Messages Received</h4>
+  {% for message in contact.response_set.all %}
+  <p><strong>{{ message.date_received }}: </strong>{{ message.body }}</p>
+  {% endfor %}
+ 
+</div>
+{% endblock %}

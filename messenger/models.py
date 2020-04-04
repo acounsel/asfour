@@ -48,6 +48,7 @@ class Contact(models.Model):
         Organization, on_delete=models.CASCADE)
     phone = models.CharField(max_length=50, blank=True)
     email = models.CharField(max_length=255, blank=True)
+    address = models.CharField(max_length=255, blank=True)
     preferred_method = models.CharField(max_length=30, 
         choices=MEDIUM_CHOICES, default=SMS)
     has_consented = models.BooleanField(default=False)
@@ -60,6 +61,10 @@ class Contact(models.Model):
     def get_absolute_url(self):
         return reverse('contact-detail', 
             kwargs={'pk':self.id})
+
+    def get_full_name(self):
+        return '{0} {1}'.format(
+            self.first_name, self.last_name)
     # def get_absolute_url(self):
     #     return reverse('contact-list') + '
     # ?project={0}'.format(getattr(self.project, 'id', ''))
@@ -81,7 +86,7 @@ class Message(models.Model):
         return reverse('message-detail', 
             kwargs={'pk':self.id})
 
-    def send(self):
+    def send(self, request=None):
         account_sid, auth_token, phone = self.organization \
         .get_credentials()
         client = Client(account_sid, auth_token)
@@ -91,7 +96,34 @@ class Message(models.Model):
         for contact in self.contacts.all():
             kwargs['to'] = contact.phone
             message = client.messages.create(**kwargs)
+            self.log_message(request)
         return True
+
+    def log_message(self, request=None):
+        log = MessageLog.objects.create(
+            message=self,
+            contact=contact,
+        )
+        if request:
+            log.sender = request.user.userprofile
+        log.save()
+
+class MessageLog(models.Model):
+
+    message = models.ForeignKey(Message, 
+        on_delete=models.CASCADE)
+    contact = models.ForeignKey(Contact, 
+        on_delete=models.SET_NULL, blank=True, null=True)
+    date = models.DateTimeField(auto_now_add=True)
+    sender = models.ForeignKey(UserProfile,
+        on_delete=models.SET_NULL, blank=True, null=True)
+
+    def __str__(self):
+        return '{0} sent to {1} on {2}'.format(
+            self.message.body,
+            self.contact.get_full_name(),
+            self.date
+        )
 
 class Response(models.Model):
 
@@ -106,6 +138,14 @@ class Response(models.Model):
 
     def __str__(self):
         return self.body
+
+    def find_contact(self):
+        contact, created = Contact.objects.get_or_create(
+            phone=self.phone, organization=self.organization)
+        self.contact = contact
+        self.save()
+
+
 
 
 
