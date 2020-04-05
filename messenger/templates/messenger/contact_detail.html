@@ -13,12 +13,13 @@
   <h3>History</h3>
   <h4>Messages Sent</h4>
   {% for message in contact.messagelog_set.all %}
-  <p><strong><a href="{{ message.message.get_absolute_url }}">{{ message.date }}</a>: </strong>{{ message.message.body }}</p>
+  <p><strong>{{ message.date }}: </strong><a href="{{ message.message.get_absolute_url }}">{{ message.message.body }}</a></p>
   {% endfor %}
   <h4>Messages Received</h4>
   {% for message in contact.response_set.all %}
   <p><strong>{{ message.date_received }}: </strong>{{ message.body }}</p>
   {% endfor %}
+  {% include 'addins/notes.html' %}
  
 </div>
 {% endblock %}

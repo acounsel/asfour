@@ -24,11 +24,11 @@
           <div class="card-body">
             <div class="d-flex align-items-center">
               <div class="Icons">
-                <i class="fas fa-address-book fa-3x pr-4"></i>
+                <a class="text-dark" href="{% url 'contact-list' %}"><i class="fas fa-address-book fa-3x pr-4"></i></a>
               </div>
               <div>
-                <h5 class="card-title">Contacts</h5>
-                <p class="card-text">You have {{ contact_list.count|default:"no" }} contacts</p>
+                <h5 class="card-title"><a class="text-dark" href="{% url 'contact-list' %}">Contacts</a></h5>
+                <p class="card-text"><a class="text-dark" href="{% url 'contact-list' %}">You have {{ contact_list.count|default:"no" }} contacts</a></p>
               </div>
             </div>
           </div>
@@ -42,11 +42,11 @@
           <div class="card-body">
             <div class="d-flex align-items-center">
               <div class="Icons">
-                <i class="fas fa-comments fa-3x pr-4"></i>
+                <a class="text-dark" href="{% url 'message-list' %}"><i class="fas fa-comments fa-3x pr-4"></i></a>
               </div>
               <div>
-                <h5 class="card-title">Messages</h5>
-                <p class="card-text">You have {{ message_list.count|default:"no" }} message templates</p>
+                <h5 class="card-title"><a class="text-dark" href="{% url 'message-list' %}">Messages</a></h5>
+                <p class="card-text"><a class="text-dark" href="{% url 'message-list' %}">You have {{ message_list.count|default:"no" }} message templates</a></p>
               </div>
             </div>
           </div>
@@ -60,11 +60,11 @@
           <div class="card-body">
             <div class="d-flex align-items-center">
               <div class="Icons">
-                <i class="fas fa-reply-all fa-3x pr-4"></i>
+                <a class="text-dark" href="{% url 'response-list' %}"><i class="fas fa-reply-all fa-3x pr-4"></i></a>
               </div>
               <div>
-                <h5 class="card-title">Responses</h5>
-                <p class="card-text">You have {{ response_list.count|default:"no" }} responses</p>
+                <h5 class="card-title"><a class="text-dark" href="{% url 'response-list' %}">Responses</a></h5>
+                <p class="card-text"><a class="text-dark" href="{% url 'response-list' %}">You have {{ response_list.count|default:"no" }} responses<a></p>
               </div>
             </div>
           </div>

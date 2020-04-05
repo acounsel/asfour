@@ -9,5 +9,8 @@
   <p>{{ contact.first_name }} {{ contact.last_name }}: {{ contact.phone }}</p>
   {% endfor %}
   <a class="btn btn-primary d-xl-inline-block w-25" href="{% url 'message-send' pk=message.id %}">SEND</a>
+  <div class="mt-5">
+  {% include 'addins/notes.html' %}
+  </div>
 </div>
 {% endblock %}

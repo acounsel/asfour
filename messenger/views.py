@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
@@ -12,7 +13,7 @@ from django.utils.decorators import method_decorator
 from .decorators import validate_twilio_request
 from .functions import send_email
 from .models import Organization, UserProfile, Contact
-from .models import Message, Response
+from .models import Message, MessageLog, Response, Note
 
 from twilio.twiml.voice_response import VoiceResponse
 from twilio.twiml.messaging_response import MessagingResponse
@@ -30,6 +31,22 @@ class LoginRequiredMixin(LoginRequiredMixin):
     def get_org(self):
         return self.get_profile().organization
 
+class NoteMixin:
+
+    def post(self, request, **kwargs):
+        userprofile = request.user.userprofile
+        note = Note.objects.create(
+            body = request.POST.get('note'),
+            organization = userprofile.organization,
+            author = userprofile,
+        )
+        field = self.model._meta.verbose_name
+        value = self.get_object()
+        setattr(note, field, value)
+        note.save()
+        messages.success(request, 'Note Added!')
+        return redirect(value.get_absolute_url())
+
 class Home(View):
     template_name = 'home.html'
 
@@ -38,9 +55,12 @@ class Home(View):
             org = self.request.user.userprofile.organization
             kwargs = {'organization': org,}
             context = {
-                'contact_list': Contact.objects.filter(**kwargs),
-                'message_list': Message.objects.filter(**kwargs),
-                'respone_list': Response.objects.filter(**kwargs),
+                'contact_list': Contact.objects.filter(
+                    **kwargs),
+                'message_list': Message.objects.filter(
+                    **kwargs),
+                'respone_list': Response.objects.filter(
+                    **kwargs),
             }
         else:
             context = {}
@@ -72,7 +92,8 @@ class OrgListView(LoginRequiredMixin, ListView):
         organization = self.get_org()
         return queryset.filter(organization=organization)
 
-class OrgDetailView(LoginRequiredMixin, DetailView):
+class OrgDetailView(LoginRequiredMixin, 
+    NoteMixin, DetailView):
 
     def get_queryset(self):
         queryset = super(OrgDetailView, self).get_queryset()
@@ -145,7 +166,11 @@ class MessageSend(MessageDetail):
         context = self.get_context_data(**kwargs)
         message = self.get_object()
         message.send(request)
+        messages.success(request, 'Message Sent!')
         return redirect(reverse('home'))
+
+class MessageLogList(OrgListView):
+    model = MessageLog
 
 class ResponseView(View):
     model = Response

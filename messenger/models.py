@@ -96,12 +96,13 @@ class Message(models.Model):
         for contact in self.contacts.all():
             kwargs['to'] = contact.phone
             message = client.messages.create(**kwargs)
-            self.log_message(request)
+            self.log_message(contact, request)
         return True
 
-    def log_message(self, request=None):
+    def log_message(self, contact, request=None):
         log = MessageLog.objects.create(
             message=self,
+            organization=self.organization,
             contact=contact,
         )
         if request:
@@ -112,6 +113,8 @@ class MessageLog(models.Model):
 
     message = models.ForeignKey(Message, 
         on_delete=models.CASCADE)
+    organization = models.ForeignKey(
+        Organization, on_delete=models.CASCADE)
     contact = models.ForeignKey(Contact, 
         on_delete=models.SET_NULL, blank=True, null=True)
     date = models.DateTimeField(auto_now_add=True)
@@ -145,7 +148,25 @@ class Response(models.Model):
         self.contact = contact
         self.save()
 
+class Note(models.Model):
 
+    body = models.TextField(blank=True)
+    organization = models.ForeignKey(
+        Organization, on_delete=models.CASCADE)
+    contact = models.ForeignKey(Contact, 
+        on_delete=models.SET_NULL, blank=True, null=True)
+    message = models.ForeignKey(Message, 
+        on_delete=models.SET_NULL, blank=True, null=True)
+    message_log = models.ForeignKey(MessageLog,
+        on_delete=models.SET_NULL, blank=True, null=True)
+    response = models.ForeignKey(Response,
+        on_delete=models.SET_NULL, blank=True, null=True)
+    date = models.DateTimeField(auto_now_add=True)
+    author = models.ForeignKey(UserProfile, 
+        on_delete=models.SET_NULL, blank=True, null=True)
+
+    def __str__(self):
+        return self.body
 
 
 
