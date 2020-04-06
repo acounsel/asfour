@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="d-flex justify-content-between">
+  <h1>Message List</h1>
+  <h2><a href=""><i class="fas fa-download pr-4"></i></a></h2>
+</div>
+<div class="card mt-5">
+  <table class="table" data-sorting="true">
+    <thead>
+      <tr>
+        <th scope="col">Message</th>
+        <th scope="col">Send To</th>
+        <th scope="col">Sent By</th>
+        <th scope="col">Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for message in messagelog_list %}
+      <tr>
+        <th scope="row"><a href="{{ message.message.et_absolute_url }}">{{ message.message }}</a></th>
+        <td>{{ message.contact }}</td>
+        <td>{{ message.sender }}</td>
+        <td>{{ message.date }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

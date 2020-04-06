@@ -1,6 +1,8 @@
 from django.apps import apps
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
+from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
@@ -195,3 +197,22 @@ class HarvestResponse(View):
         resp = MessagingResponse()
         resp.message('Thank you for your message')
         return HttpResponse(str(resp))
+
+class OrganizationUpdate(SuccessMessageMixin, UpdateView):
+    model = Organization
+    fields = ('name', 'twilio_api_key', 'twilio_secret', 'phone')
+    success_message = 'Organization Updated!'
+    success_url = reverse_lazy('home')
+
+    def get_object(self):
+        return self.request.user.userprofile.organization
+
+class UserUpdate(SuccessMessageMixin, UpdateView):
+    model = User
+    fields = ('first_name', 'last_name', 'email')
+    success_message = 'User Updated!'
+    success_url = reverse_lazy('home')
+    template_name = 'messenger/user_form.html'
+
+    def get_object(self):
+        return self.request.user

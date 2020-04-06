@@ -23,6 +23,7 @@
         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
           <a class="dropdown-item" href="{% url 'message-list' %}">View Messages</a>
           <a class="dropdown-item" href="{% url 'message-create' %}">Add Message</a>
+          <a class="dropdown-item" href="{% url 'messagelog-list' %}">Send Log</a>
         </div>
       </li>
       <li class="nav-item dropdown mr-auto">
@@ -30,7 +31,7 @@
           Responses
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-          <a class="dropdown-item" href="{% url 'response-list' %}">View Response</a>
+          <a class="dropdown-item" href="{% url 'response-list' %}">View Responses</a>
         </div>
       </li>
      <!--  <li class="nav-item dropdown mr-auto">
@@ -48,8 +49,8 @@
           <span class="UserIcon mr-3 text-white"><i class="far fa-user"></i></span>{{ request.user.first_name }}
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" href="#">Settings</a>
-          <a class="dropdown-item" href="#">Organization</a>
+          <a class="dropdown-item" href="{% url 'user-update' %}">Settings</a>
+          <a class="dropdown-item" href="{% url 'organization-update' %}">Organization</a>
           <div class="dropdown-divider"></div>
           <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
           </div>

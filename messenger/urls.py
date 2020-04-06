@@ -15,6 +15,7 @@ urlpatterns = [
     ])),
     path('messages/', include([
         path('', views.MessageList.as_view(), name='message-list'),
+        path('log/',views.MessageLogList.as_view(), name='messagelog-list'),
         path('add/',views.MessageCreate.as_view(), name='message-create'),
         # path('export/', views.CommitmentExport.as_view(), name='commitment-export'),
         path('<pk>/', include([
@@ -27,4 +28,6 @@ urlpatterns = [
     path('responses/', include([
         path('', views.ResponseList.as_view(), name='response-list'),
     ])),
+    path('organization/', views.OrganizationUpdate.as_view(), name='organization-update'),
+    path('user/', views.UserUpdate.as_view(), name='user-update'),
 ]
