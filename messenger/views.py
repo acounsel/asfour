@@ -1,3 +1,6 @@
+import csv
+import io
+
 from django.apps import apps
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -145,6 +148,61 @@ class ContactCreate(ContactView, OrgCreateView):
 class ContactUpdate(ContactView, OrgUpdateView):
     pass
 
+class ContactImport(ContactList):
+    template_name = 'messenger/contact_import.html'
+
+    def post(self, request, **kwargs):
+        organization = request.user.userprofile.organization
+        try:
+            import_file = request.FILES['csv_file']
+        except KeyError:
+            messages.error(request, 'Please upload a file.')
+        else:
+            errors = self.import_csv_data(import_file, 
+                organization=organization)
+            print(errors)
+            messages.success(request, 
+                'Contacts successfully uploaded.')
+        return redirect(reverse('home'))
+
+    def import_csv_data(self, import_file, organization):
+        errors = []
+        try:
+            # with open(import_file, 'rt', encoding="utf-8",
+            # errors='ignore') as csvfile:
+            reader = csv.DictReader(
+                io.StringIO(
+                    import_file.read().decode('utf-8')
+                )
+            )
+        except Exception as error:
+            errors.append(error)
+            messages.error(self.request, \
+                'Failed to read file. Please make sure \
+                the file is in CSV format.')
+        else:
+            errors = self.enumerate_rows(reader, organization)
+        return errors
+
+    # Loop through CSV, skipping header row.
+    def enumerate_rows(self, reader, org, start=1):
+        row_errors = []
+        # Index is for row numbers in error message-s.
+        for index, contact in enumerate(reader, start=1):
+            contact.update({'organization': org})
+            row_errors = []
+            try:
+                self.import_contact_row(contact)
+            except Exception as error:
+                row_errors.append('Row {0}: {1}'.format(
+                    index, error))
+        return row_errors
+
+    def import_contact_row(self, contact_dict):
+        contact = Contact.objects.get_or_create(
+            **contact_dict)
+        return contact
+
 class MessageView(View):
     model = Message
     fields = ('body', 'attachment', 'contacts')
@@ -200,7 +258,8 @@ class HarvestResponse(View):
 
 class OrganizationUpdate(SuccessMessageMixin, UpdateView):
     model = Organization
-    fields = ('name', 'twilio_api_key', 'twilio_secret', 'phone')
+    fields = ('name', 'twilio_api_key', 'twilio_secret',
+        'phone')
     success_message = 'Organization Updated!'
     success_url = reverse_lazy('home')
 

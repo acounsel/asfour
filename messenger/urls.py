@@ -6,7 +6,8 @@ urlpatterns = [
     path('', views.Home.as_view(), name='home'),
     path('contacts/', include([
         path('', views.ContactList.as_view(), name='contact-list'),
-        path('add/',views.ContactCreate.as_view(), name='contact-create'),
+        path('add/', views.ContactCreate.as_view(), name='contact-create'),
+        path('import/', views.ContactImport.as_view(), name='contact-import'),
         # path('export/', views.CommitmentExport.as_view(), name='commitment-export'),
         path('<pk>/', include([
             path('', views.ContactDetail.as_view(), name='contact-detail'),

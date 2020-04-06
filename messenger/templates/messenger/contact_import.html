@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block body %}
+  <h1>Import Contacts</h1>
+  <p>To import a list of contacts, download <a href="https://s3-us-west-1.amazonaws.com/aconsole-static/media/public/import_contacts.csv" target="_blank">this csv template</a> and add all contacts in the proper format, then upload it below.</p>
+  <form action="" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" class="form-control-file mb-4" name="csv_file">
+    <input type="submit" class="btn btn-primary" value="Upload">
+  </form>
+{% endblock %}
