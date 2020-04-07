@@ -8,6 +8,7 @@
   <p><strong>Email: </strong>{{ contact.email }}</p>
   <p><strong>Phone: </strong>{{ contact.phone }}</p>
   <p><strong>Address: </strong>{{ contact.get_address }}</p>
+  <p><strong>Tags: </strong>{{ contact.tags.all|join:", " }}</p>
   <p><strong>Has WhatsApp: </strong>{{ contact.has_whatsapp }}</p>
   <p><strong>Preferred Communication Method: </strong>{{ contact.get_preferred_method_display }}</p>
   <h3>History</h3>
