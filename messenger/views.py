@@ -153,6 +153,13 @@ class ContactView(View):
         'preferred_method', 'tags', 'has_whatsapp')
     success_url = reverse_lazy('contact-list')
 
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        org = self.request.user.userprofile.organization
+        form.fields['tags'].queryset = Tag.objects.filter(
+            organization=org)
+        return form
+
 class ContactList(ContactView, OrgListView):
     pass
 
@@ -224,12 +231,22 @@ class MessageView(View):
     model = Message
     fields = ('body', 'attachment', 'tags', 'contacts')
 
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        org = self.request.user.userprofile.organization
+        form.fields['tags'].queryset = Tag.objects.filter(
+            organization=org)
+        form.fields['contacts'].queryset = Contact.objects \
+        .filter(organization=org)
+        return form
+
     def form_valid(self, form):
         response = super().form_valid(form)
-        for tag in self.object.tags.all():
-            for contact in tag.contact_set.all():
-                if contact not in self.object.contacts.all():
-                    self.object.contacts.add(contact)
+        contacts = Contact.objects.filter(
+            tags__in=self.object.tags.all()).distinct()
+        for contact in contacts:
+            if contact not in self.object.contacts.all():
+                self.object.contacts.add(contact)
         self.object.save()
         return response
 
