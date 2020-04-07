@@ -11,6 +11,7 @@
         <th scope="col">Name</th>
         <th scope="col">Phone</th>
         <th scope="col">Email</th>
+        <th scope="col">Tags</th>
         <th scope="col">Contact Preference</th>
       </tr>
     </thead>
@@ -20,6 +21,7 @@
         <th scope="row"><a href="{{ contact.get_absolute_url }}">{{ contact.first_name }} {{ contact.last_name }}</a></th>
         <td>{{ contact.phone }}</td>
         <td>{{ contact.email }}</td>
+        <td>{{ contact.tags.all|join:", " }}</td>
         <td>{{ contact.get_preferred_method_display }}</td>
       </tr>
       {% endfor %}

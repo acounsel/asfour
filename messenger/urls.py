@@ -4,6 +4,14 @@ from . import views
 
 urlpatterns = [
     path('', views.Home.as_view(), name='home'),
+    path('tags/', include([
+        path('', views.TagList.as_view(), name='tag-list'),
+        path('add/', views.TagCreate.as_view(), name='tag-create'),
+        path('<pk>/', include([
+            path('', views.TagDetail.as_view(), name='tag-detail'),
+            path('update/', views.TagUpdate.as_view(), name='tag-update'),
+        ])),
+    ])),
     path('contacts/', include([
         path('', views.ContactList.as_view(), name='contact-list'),
         path('add/', views.ContactCreate.as_view(), name='contact-create'),

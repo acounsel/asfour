@@ -31,6 +31,19 @@ class UserProfile(models.Model):
     def __str__(self):
         return self.user.get_full_name()
 
+class Tag(models.Model):
+
+    name = models.CharField(max_length=255)
+    organization = models.ForeignKey(
+        Organization, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('tag-detail', 
+            kwargs={'pk':self.id})
+
 class Contact(models.Model):
     SMS = 'sms'
     VOICE = 'voice'
@@ -51,6 +64,7 @@ class Contact(models.Model):
     address = models.CharField(max_length=255, blank=True)
     preferred_method = models.CharField(max_length=30, 
         choices=MEDIUM_CHOICES, default=SMS)
+    tags = models.ManyToManyField(Tag, blank=True)
     has_consented = models.BooleanField(default=False)
     has_whatsapp = models.BooleanField(default=False)
 

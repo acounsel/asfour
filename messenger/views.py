@@ -17,7 +17,7 @@ from django.utils.decorators import method_decorator
 
 from .decorators import validate_twilio_request
 from .functions import send_email
-from .models import Organization, UserProfile, Contact
+from .models import Organization, UserProfile, Contact, Tag
 from .models import Message, MessageLog, Response, Note
 
 from twilio.twiml.voice_response import VoiceResponse
@@ -130,10 +130,27 @@ class OrgUpdateView(LoginRequiredMixin, UpdateView):
         )
         return super().form_valid(form)
 
+class TagView(View):
+    model = Tag
+    fields = ('name',)
+    success_url = reverse_lazy('tag-list')
+
+class TagList(TagView, OrgListView):
+    pass
+
+class TagDetail(TagView, OrgDetailView):
+    pass
+
+class TagCreate(TagView, OrgCreateView):
+    pass
+
+class TagUpdate(TagView, OrgUpdateView):
+    pass
+
 class ContactView(View):
     model = Contact
     fields = ('first_name', 'last_name', 'phone', 'email',
-        'preferred_method', 'has_whatsapp')
+        'preferred_method', 'tags', 'has_whatsapp')
     success_url = reverse_lazy('contact-list')
 
 class ContactList(ContactView, OrgListView):

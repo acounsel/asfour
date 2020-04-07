@@ -27,12 +27,21 @@
           <a class="dropdown-item" href="{% url 'messagelog-list' %}">Send Log</a>
         </div>
       </li>
-      <li class="nav-item dropdown mr-auto">
+      <li class="nav-item dropdown mr-3">
         <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Responses
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
           <a class="dropdown-item" href="{% url 'response-list' %}">View Responses</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown mr-auto">
+        <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Tags
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" href="{% url 'tag-list' %}">View Tags</a>
+          <a class="dropdown-item" href="{% url 'tag-create' %}">Add Tag</a>
         </div>
       </li>
      <!--  <li class="nav-item dropdown mr-auto">
