@@ -222,7 +222,16 @@ class ContactImport(ContactList):
 
 class MessageView(View):
     model = Message
-    fields = ('body', 'attachment', 'contacts')
+    fields = ('body', 'attachment', 'tags', 'contacts')
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        for tag in self.object.tags.all():
+            for contact in tag.contact_set.all():
+                if contact not in self.object.contacts.all():
+                    self.object.contacts.add(contact)
+        self.object.save()
+        return response
 
 class MessageList(MessageView, OrgListView):
     pass

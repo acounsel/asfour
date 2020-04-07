@@ -89,6 +89,7 @@ class Message(models.Model):
     attachment = models.FileField(
         storage=PrivateMediaStorage(), 
         upload_to='files/', blank=True, null=True)
+    tags = models.ManyToManyField(Tag, blank=True)
     contacts = models.ManyToManyField(Contact, blank=True)
     organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE)
