@@ -13,6 +13,12 @@ class Organization(models.Model):
     twilio_secret = models.CharField(
         max_length=255, blank=True)
     phone = models.CharField(max_length=40, blank=True)
+    response_msg = models.CharField(max_length=255, 
+        default='Thank you, your message has been received')
+    forward_phone = models.CharField(
+        max_length=40, blank=True)
+    forward_email = models.CharField(
+        max_length=255, blank=True)
 
     def __str__(self):
         return self.name
@@ -162,6 +168,20 @@ class Response(models.Model):
             phone=self.phone, organization=self.organization)
         self.contact = contact
         self.save()
+
+    def forward(self):
+        if organization.forward_phone:
+            account_sid, auth_token, phone = \
+            self.organization.get_credentials()
+            client = Client(account_sid, auth_token)
+            kwargs = {
+                'body':self.body,
+                'from_':self.phone,
+                'to': self.organization.forward_phone
+            }
+            message = client.messages.create(**kwargs)
+            return True
+        return False
 
 class Note(models.Model):
 

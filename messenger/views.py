@@ -295,14 +295,16 @@ class HarvestResponse(View):
             organization=organization,
         )
         response.find_contact()
+        response.forward()
         resp = MessagingResponse()
-        resp.message('Thank you for your message')
+        resp.message(organization.response_msg)
         return HttpResponse(str(resp))
 
 class OrganizationUpdate(SuccessMessageMixin, UpdateView):
     model = Organization
     fields = ('name', 'twilio_api_key', 'twilio_secret',
-        'phone')
+        'phone', 'response_msg', 'forward_phone', 
+        'forward_email')
     success_message = 'Organization Updated!'
     success_url = reverse_lazy('home')
 
