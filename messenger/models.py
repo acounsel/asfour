@@ -3,6 +3,7 @@ from django.db import models
 from django.urls import reverse
 
 from asfour.storage_backends import PrivateMediaStorage
+from asfour.storage_backends import PublicMediaStorage
 from twilio.rest import Client
 
 class Organization(models.Model):
@@ -50,6 +51,10 @@ class Tag(models.Model):
         return reverse('tag-detail', 
             kwargs={'pk':self.id})
 
+    def get_delete_url(self):
+        return reverse('tag-delete',
+            kwargs={'pk':self.id})
+
 class Contact(models.Model):
     SMS = 'sms'
     VOICE = 'voice'
@@ -82,18 +87,37 @@ class Contact(models.Model):
         return reverse('contact-detail', 
             kwargs={'pk':self.id})
 
+    def get_delete_url(self):
+        return reverse('contact-delete',
+            kwargs={'pk':self.id})
+
     def get_full_name(self):
         return '{0} {1}'.format(
             self.first_name, self.last_name)
+
     # def get_absolute_url(self):
     #     return reverse('contact-list') + '
     # ?project={0}'.format(getattr(self.project, 'id', ''))
 
 class Message(models.Model):
-
+    SMS = 'sms'
+    VOICE = 'voice'
+    EMAIL = 'email'
+    WHATSAPP = 'whatsapp'
+    MEDIUM_CHOICES = (
+        (SMS, 'SMS'),
+        (VOICE, 'Voice'),
+        (EMAIL, 'Email'),
+        (WHATSAPP, 'WhatsApp'),
+    )
     body = models.CharField(max_length=255)
+    method = models.CharField(max_length=50, 
+        choices=MEDIUM_CHOICES, default=SMS)
     attachment = models.FileField(
         storage=PrivateMediaStorage(), 
+        upload_to='files/', blank=True, null=True)
+    recording = models.FileField(
+        storage=PublicMediaStorage(), 
         upload_to='files/', blank=True, null=True)
     tags = models.ManyToManyField(Tag, blank=True)
     contacts = models.ManyToManyField(Contact, blank=True)
@@ -107,18 +131,37 @@ class Message(models.Model):
         return reverse('message-detail', 
             kwargs={'pk':self.id})
 
+    def get_delete_url(self):
+        return reverse('message-delete',
+            kwargs={'pk':self.id})
+
     def send(self, request=None):
         account_sid, auth_token, phone = self.organization \
         .get_credentials()
         client = Client(account_sid, auth_token)
-        kwargs = {'body':self.body,'from_':phone,}
-        if self.attachment:
-            kwargs['media_url'] = [self.attachment.url]
+        kwargs = self.get_kwargs(phone)
+        sender_client = self.get_client_verb(client)
         for contact in self.contacts.all():
             kwargs['to'] = contact.phone
-            message = client.messages.create(**kwargs)
+            message = sender_client.create(**kwargs)
             self.log_message(contact, request)
         return True
+
+    def get_kwargs(self, phone):
+        if self.method == self.SMS:
+            kwargs = {'body':self.body,'from_':phone,}
+            if self.attachment:
+                kwargs['media_url'] = [self.attachment.url]
+        else:
+            kwargs = {'url':self.recording.url,'from_':phone,}
+        return kwargs
+
+    def get_client_verb(self, client):
+        if self.method == self.SMS:
+            verb = 'messages'
+        else:
+            verb = 'calls'
+        return getattr(client, verb)
 
     def log_message(self, contact, request=None):
         log = MessageLog.objects.create(
@@ -150,7 +193,19 @@ class MessageLog(models.Model):
         )
 
 class Response(models.Model):
+    SMS = 'sms'
+    VOICE = 'voice'
+    EMAIL = 'email'
+    WHATSAPP = 'whatsapp'
+    MEDIUM_CHOICES = (
+        (SMS, 'SMS'),
+        (VOICE, 'Voice'),
+        (EMAIL, 'Email'),
+        (WHATSAPP, 'WhatsApp'),
+    )
 
+    method = models.CharField(max_length=50, 
+        choices=MEDIUM_CHOICES, default=SMS)
     contact = models.ForeignKey(Contact, 
         on_delete=models.SET_NULL, blank=True, null=True)
     phone = models.CharField(max_length=100, blank=True)

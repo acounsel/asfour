@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% load custom_tags %}
+{% block body %}
+<h1>Delete  {{ object|verbose_name }}</h1>
+<form method="post">{% csrf_token %}
+  <p>Are you sure you want to delete "{{ object }}"?</p>
+  <input class="btn btn-danger" type="submit" value="Confirm">
+</form>
+{% endblock %}

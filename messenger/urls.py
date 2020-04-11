@@ -10,6 +10,7 @@ urlpatterns = [
         path('<pk>/', include([
             path('', views.TagDetail.as_view(), name='tag-detail'),
             path('update/', views.TagUpdate.as_view(), name='tag-update'),
+            path('delete/', views.TagDelete.as_view(), name='tag-delete'),
         ])),
     ])),
     path('contacts/', include([
@@ -20,6 +21,7 @@ urlpatterns = [
         path('<pk>/', include([
             path('', views.ContactDetail.as_view(), name='contact-detail'),
             path('update/', views.ContactUpdate.as_view(), name='contact-update'),
+            path('delete/', views.ContactDelete.as_view(), name='contact-delete'),
         ])),
     ])),
     path('messages/', include([
@@ -31,6 +33,7 @@ urlpatterns = [
             path('', views.MessageDetail.as_view(), name='message-detail'),
             path('update/', views.MessageUpdate.as_view(), name='message-update'),
             path('send/', views.MessageSend.as_view(), name='message-send'),
+            path('delete/', views.MessageDelete.as_view(), name='message-delete'),
         ])),
     ])),
     path('response/<int:pk>/', views.HarvestResponse.as_view(), name='harvest-response'),

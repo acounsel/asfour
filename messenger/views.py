@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic import View, DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import DeleteView
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 
@@ -35,6 +36,21 @@ class LoginRequiredMixin(LoginRequiredMixin):
 
     def get_org(self):
         return self.get_profile().organization
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        organization = self.get_org()
+        return queryset.filter(organization=organization)
+
+    def form_valid(self, form):
+        form.instance.organization = self.get_org()
+        messages.success(
+            self.request,
+            '{} Created'.format(
+                form.instance._meta.verbose_name.title()
+            )
+        )
+        return super().form_valid(form)
 
 class NoteMixin:
 
@@ -91,44 +107,25 @@ class Home(View):
         return render(request, self.template_name, context)
 
 class OrgListView(LoginRequiredMixin, ListView):
-
-    def get_queryset(self):
-        queryset = super(OrgListView, self).get_queryset()
-        organization = self.get_org()
-        return queryset.filter(organization=organization)
+    pass
+    
 
 class OrgDetailView(LoginRequiredMixin, 
     NoteMixin, DetailView):
+    pass
 
-    def get_queryset(self):
-        queryset = super(OrgDetailView, self).get_queryset()
-        organization = self.get_org()
-        return queryset.filter(organization=organization)
+class OrgDeleteView(LoginRequiredMixin, DeleteView):
+    template_name = 'messenger/confirm_delete.html'
+    
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, 'Succesfully Deleted')
+        return super().delete(request, *args, **kwargs)
 
 class OrgCreateView(LoginRequiredMixin, CreateView):
-
-    def form_valid(self, form):
-        form.instance.organization = self.get_org()
-        messages.success(
-            self.request,
-            '{} Created'.format(
-                form.instance._meta.verbose_name.title()
-            )
-        )
-        # response = super().form_valid(form)
-        return super().form_valid(form)
+    pass
 
 class OrgUpdateView(LoginRequiredMixin, UpdateView):
-
-    def form_valid(self, form):
-        form.instance.organization = self.get_org()
-        messages.success(
-            self.request,
-            '{} Created'.format(
-                form.instance._meta.verbose_name.title()
-            )
-        )
-        return super().form_valid(form)
+    pass
 
 class TagView(View):
     model = Tag
@@ -145,6 +142,9 @@ class TagCreate(TagView, OrgCreateView):
     pass
 
 class TagUpdate(TagView, OrgUpdateView):
+    pass
+
+class TagDelete(TagView, OrgDeleteView):
     pass
 
 class ContactView(View):
@@ -170,6 +170,9 @@ class ContactCreate(ContactView, OrgCreateView):
     pass
 
 class ContactUpdate(ContactView, OrgUpdateView):
+    pass
+
+class ContactDelete(ContactView, OrgDeleteView):
     pass
 
 class ContactImport(ContactList):
@@ -229,7 +232,9 @@ class ContactImport(ContactList):
 
 class MessageView(View):
     model = Message
-    fields = ('body', 'attachment', 'tags', 'contacts')
+    fields = ('method', 'body', 'attachment', 'recording', 
+        'tags', 'contacts')
+    success_url = reverse_lazy('message-list')
 
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)
@@ -260,6 +265,9 @@ class MessageCreate(MessageView, OrgCreateView):
     pass
 
 class MessageUpdate(MessageView, OrgUpdateView):
+    pass
+
+class MessageDelete(MessageView, OrgDeleteView):
     pass
 
 class MessageSend(MessageDetail):
