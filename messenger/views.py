@@ -290,11 +290,12 @@ class ResponseList(ResponseView, OrgListView):
     pass
 
 @method_decorator(decorators, name='dispatch')
-class VoiceCall(DetailView):
+class VoiceCall(View):
     model = Message
 
     def get_twiml(self):
-        message = self.get_object()
+        message = Message.objects.get(
+            id=self.kwargs.get('msg_id'))
         twiml_response = VoiceResponse()
         twiml_response.play(message.recording.url)
         return twiml_response

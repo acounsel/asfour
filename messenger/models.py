@@ -117,7 +117,7 @@ class Message(models.Model):
         storage=PrivateMediaStorage(), 
         upload_to='files/', blank=True, null=True)
     recording = models.FileField(
-        storage=PrivateMediaStorage(), 
+        storage=PublicMediaStorage(), 
         upload_to='files/', blank=True, null=True)
     tags = models.ManyToManyField(Tag, blank=True)
     contacts = models.ManyToManyField(Contact, blank=True)
@@ -155,8 +155,10 @@ class Message(models.Model):
                 kwargs['media_url'] = [self.attachment.url]
         else:
             kwargs['url'] = request.build_absolute_uri(
-                reverse('voice-call', 
-                    kwargs={'pk':self.id})
+                reverse('voice-call', kwargs={
+                    'pk': self.organization.id,
+                    'msg_id': self.id
+                })
             )
         return kwargs
 
