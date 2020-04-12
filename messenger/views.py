@@ -289,6 +289,7 @@ class ResponseView(View):
 class ResponseList(ResponseView, OrgListView):
     pass
 
+@method_decorator(decorators, name='dispatch')
 class VoiceCall(DetailView):
     model = Message
 
