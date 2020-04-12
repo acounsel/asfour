@@ -290,6 +290,30 @@ class ResponseList(ResponseView, OrgListView):
     pass
 
 @method_decorator(decorators, name='dispatch')
+class VoiceCall(DetailView):
+    model = Message
+
+    def get_twiml(self):
+        message = self.get_object()
+        twiml_response = VoiceResponse()
+        twiml_response.say(message.recording.url)
+        return twiml_response
+
+    def get(self, request, **kwargs):
+        print('its a get!')
+        return HttpResponse(
+            self.get_twiml(),
+            content_type='application/xml'
+        )
+
+    def post(self, request, **kwargs):
+        print('its a post!')
+        return HttpResponse(
+            self.get_twiml(),
+            content_type='application/xml'
+        )
+
+@method_decorator(decorators, name='dispatch')
 class HarvestResponse(View):
 
     def post(self, request, **kwargs):

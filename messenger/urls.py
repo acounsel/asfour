@@ -33,6 +33,7 @@ urlpatterns = [
             path('', views.MessageDetail.as_view(), name='message-detail'),
             path('update/', views.MessageUpdate.as_view(), name='message-update'),
             path('send/', views.MessageSend.as_view(), name='message-send'),
+            path('voice-call/', views.VoiceCall.as_view(), name='voice-call'),
             path('delete/', views.MessageDelete.as_view(), name='message-delete'),
         ])),
     ])),

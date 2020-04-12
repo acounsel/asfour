@@ -139,7 +139,7 @@ class Message(models.Model):
         account_sid, auth_token, phone = self.organization \
         .get_credentials()
         client = Client(account_sid, auth_token)
-        kwargs = self.get_kwargs(phone)
+        kwargs = self.get_kwargs(phone, request)
         sender_client = self.get_client_verb(client)
         for contact in self.contacts.all():
             kwargs['to'] = contact.phone
@@ -147,13 +147,17 @@ class Message(models.Model):
             self.log_message(contact, request)
         return True
 
-    def get_kwargs(self, phone):
+    def get_kwargs(self, phone, request):
+        kwargs = {'from_':phone,}
         if self.method == self.SMS:
-            kwargs = {'body':self.body,'from_':phone,}
+            kwargs['body'] = self.body
             if self.attachment:
                 kwargs['media_url'] = [self.attachment.url]
         else:
-            kwargs = {'url':self.recording.url,'from_':phone,}
+            kwargs['url'] = request.build_absolute_uri(
+                reverse('voice-call', 
+                    kwargs={'pk':self.id})
+            )
         return kwargs
 
     def get_client_verb(self, client):
