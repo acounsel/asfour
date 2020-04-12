@@ -117,7 +117,7 @@ class Message(models.Model):
         storage=PrivateMediaStorage(), 
         upload_to='files/', blank=True, null=True)
     recording = models.FileField(
-        storage=PublicMediaStorage(), 
+        storage=PrivateMediaStorage(), 
         upload_to='files/', blank=True, null=True)
     tags = models.ManyToManyField(Tag, blank=True)
     contacts = models.ManyToManyField(Contact, blank=True)
