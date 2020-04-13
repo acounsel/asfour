@@ -17,6 +17,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 
 from .decorators import validate_twilio_request
+from .forms import OrganizationForm
 from .functions import send_email
 from .models import Organization, UserProfile, Contact, Tag
 from .models import Message, MessageLog, Response, Note
@@ -318,6 +319,7 @@ class VoiceCall(View):
 class HarvestResponse(View):
 
     def post(self, request, **kwargs):
+        kwargs = self.get_response_kwargs(request)
         print(request.POST)
         body = request.POST.get('Body', '')
         sid = self.get_sid(request)
@@ -325,9 +327,9 @@ class HarvestResponse(View):
             id=self.kwargs.get('pk'))
         response = Response.objects.create(
             body=body,
-            phone=request.POST.get('From'),
+            
             sid=sid,
-            organization=organization,
+            
             recording=request.POST.get('RecordingUrl', ''),
         )
         response.find_contact()
@@ -336,17 +338,25 @@ class HarvestResponse(View):
         resp.message(organization.response_msg)
         return HttpResponse(str(resp))
 
-    def get_sid(self, request):
-        for sid in ('MessageSid', 'CallSid'):
-            if request.POST.get(sid):
-                return request.POST.get(sid)
-        return None
+    def get_response_kwargs(self, request):
+        method = self.kwargs.get('method')
+        kwargs = {
+            'organization': Organization.objects.get(
+                id=self.kwargs.get('pk')),
+            'phone': request.POST.get('From'),
+        }
+        if method == 'message':
+            kwargs['sid'] = request.POST.get('MessageSid')
+            kwargs['body'] = request.POST.get('Body', '')
+        elif method == 'voice':
+            kwargs['sid'] = request.POST.get('CallSid')
+            kwargs['recording'] = request.POST.get(
+                'RecordingUrl', '')
+        return kwargs
 
 class OrganizationUpdate(SuccessMessageMixin, UpdateView):
     model = Organization
-    fields = ('name', 'twilio_api_key', 'twilio_secret',
-        'phone', 'response_msg', 'forward_phone', 
-        'forward_email')
+    form_class = OrganizationForm
     success_message = 'Organization Updated!'
     success_url = reverse_lazy('home')
 

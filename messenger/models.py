@@ -226,7 +226,7 @@ class Response(models.Model):
     def __str__(self):
         return self.body
 
-    def find_contact(self):
+    def add_contact(self):
         contact, created = Contact.objects.get_or_create(
             phone=self.phone, organization=self.organization)
         self.contact = contact

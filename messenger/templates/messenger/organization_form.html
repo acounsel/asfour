@@ -2,4 +2,6 @@
 {% block body %}
 <h1>Edit Organization</h1>
 {% include 'addins/form.html' %}
+<p class="mt-5">Message Webhook: http://www.3asfour.com/response/message/{{ form.instance.id }}/</p>
+<p class="mt-3">Voice Webhook: http://www.3asfour.com/response/voice/{{ form.instance.id }}/</p>
 {% endblock %}
