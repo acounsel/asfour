@@ -233,7 +233,7 @@ class Response(models.Model):
         self.save()
 
     def forward(self):
-        if organization.forward_phone:
+        if self.organization.forward_phone:
             account_sid, auth_token, phone = \
             self.organization.get_credentials()
             client = Client(account_sid, auth_token)
