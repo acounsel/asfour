@@ -4,6 +4,7 @@ import io
 from django.apps import apps
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponse
@@ -52,6 +53,15 @@ class LoginRequiredMixin(LoginRequiredMixin):
             )
         )
         return super().form_valid(form)
+
+class AdminMixin(UserPassesTestMixin):
+    login_url = '/login/'
+
+    def test_func(self):
+        if self.request.user.is_authenticated:
+            return self.request.user.userprofile.is_admin
+        else:
+            return False
 
 class NoteMixin:
 
@@ -299,14 +309,17 @@ class VoiceCall(View):
             id=self.kwargs.get('msg_id'))
         twiml_response = VoiceResponse()
         twiml_response.play(message.recording.url)
+        if message.request_for_response:
+            twiml_response.record(
+                # action=action,
+                method='POST',
+                max_length=10,
+                timeout=4,
+                # transcribe=True,
+                # transcribe_callback=action
+            )
+            twiml_response.say('Thank you, goodbye')
         return twiml_response
-
-    def get(self, request, **kwargs):
-        print('its a get!')
-        return HttpResponse(
-            self.get_twiml(),
-            content_type='application/xml'
-        )
 
     def post(self, request, **kwargs):
         print('its a post!')
@@ -329,22 +342,23 @@ class HarvestResponse(View):
         return HttpResponse(str(resp))
 
     def get_response_kwargs(self, request):
-        method = self.kwargs.get('method')
+        medium = self.kwargs.get('medium')
         kwargs = {
             'organization': Organization.objects.get(
                 id=self.kwargs.get('pk')),
             'phone': request.POST.get('From'),
         }
-        if method == 'message':
+        if medium == 'message':
             kwargs['sid'] = request.POST.get('MessageSid')
             kwargs['body'] = request.POST.get('Body', '')
-        elif method == 'voice':
+        elif medium == 'voice':
             kwargs['sid'] = request.POST.get('CallSid')
             kwargs['recording'] = request.POST.get(
                 'RecordingUrl', '')
         return kwargs
 
-class OrganizationUpdate(SuccessMessageMixin, UpdateView):
+class OrganizationUpdate(AdminMixin, SuccessMessageMixin, 
+    UpdateView):
     model = Organization
     form_class = OrganizationForm
     success_message = 'Organization Updated!'
