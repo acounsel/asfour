@@ -244,7 +244,7 @@ class ContactImport(ContactList):
 class MessageView(View):
     model = Message
     fields = ('method', 'body', 'attachment', 'recording', 
-        'tags', 'contacts')
+        'tags', 'contacts', 'request_for_response')
     success_url = reverse_lazy('message-list')
 
     def get_form(self, *args, **kwargs):
@@ -333,19 +333,20 @@ class HarvestResponse(View):
 
     def post(self, request, **kwargs):
         print(request.POST)
-        resp_kwargs = self.get_response_kwargs(request)
+        org = Organization.objects.get(
+            id=self.kwargs.get('pk'))
+        resp_kwargs = self.get_response_kwargs(request, org)
         response = Response.objects.create(**resp_kwargs)
         response.add_contact()
         response.forward()
         resp = MessagingResponse()
-        resp.message(organization.response_msg)
+        resp.message(org.response_msg)
         return HttpResponse(str(resp))
 
-    def get_response_kwargs(self, request):
+    def get_response_kwargs(self, request, organization):
         medium = self.kwargs.get('medium')
         kwargs = {
-            'organization': Organization.objects.get(
-                id=self.kwargs.get('pk')),
+            'organization': organization,
             'phone': request.POST.get('From'),
         }
         if medium == 'message':
