@@ -80,7 +80,7 @@ class Home(View):
                     **kwargs),
                 'message_list': Message.objects.filter(
                     **kwargs),
-                'respone_list': Response.objects.filter(
+                'response_list': Response.objects.filter(
                     **kwargs),
             }
         else:
@@ -319,7 +319,7 @@ class HarvestResponse(View):
 
     def post(self, request, **kwargs):
         print(request.POST)
-        body = request.POST.get('Body', None)
+        body = request.POST.get('Body', '')
         sid = self.get_sid(request)
         organization = Organization.objects.get(
             id=self.kwargs.get('pk'))
@@ -328,7 +328,7 @@ class HarvestResponse(View):
             phone=request.POST.get('From'),
             sid=sid,
             organization=organization,
-            recording=request.POST.get('RecordingUrl'),
+            recording=request.POST.get('RecordingUrl', ''),
         )
         response.find_contact()
         response.forward()
