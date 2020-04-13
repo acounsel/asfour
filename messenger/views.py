@@ -318,20 +318,29 @@ class VoiceCall(View):
 class HarvestResponse(View):
 
     def post(self, request, **kwargs):
+        print(request.POST)
         body = request.POST.get('Body', None)
+        sid = self.get_sid(request)
         organization = Organization.objects.get(
             id=self.kwargs.get('pk'))
         response = Response.objects.create(
             body=body,
             phone=request.POST.get('From'),
-            sid=request.POST.get('MessageSid'),
+            sid=sid,
             organization=organization,
+            recording=request.POST.get('RecordingUrl'),
         )
         response.find_contact()
         response.forward()
         resp = MessagingResponse()
         resp.message(organization.response_msg)
         return HttpResponse(str(resp))
+
+    def get_sid(self, request):
+        for sid in ('MessageSid', 'CallSid'):
+            if request.POST.get(sid):
+                return request.POST.get(sid)
+        return None
 
 class OrganizationUpdate(SuccessMessageMixin, UpdateView):
     model = Organization

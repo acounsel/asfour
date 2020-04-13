@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block body %}
-<h1>Message</h1>
+<h1>{{ message.get_method_display }} Message</h1>
 <div class="card p-4">
   <h2>{{ message.body }}</h2>
   {% if message.attachment %}

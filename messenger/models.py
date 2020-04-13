@@ -123,6 +123,7 @@ class Message(models.Model):
     contacts = models.ManyToManyField(Contact, blank=True)
     organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE)
+    request_for_response = models.BooleanField(default=False)
 
     def __str__(self):
         return self.body
@@ -216,7 +217,8 @@ class Response(models.Model):
         on_delete=models.SET_NULL, blank=True, null=True)
     phone = models.CharField(max_length=100, blank=True)
     body = models.TextField(blank=True)
-    sid = models.CharField(max_length=255)
+    recording = models.CharField(max_length=255, blank=True)
+    sid = models.CharField(max_length=255, blank=True)
     date_received = models.DateTimeField(auto_now_add=True)
     organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE)
