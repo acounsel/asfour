@@ -319,20 +319,10 @@ class VoiceCall(View):
 class HarvestResponse(View):
 
     def post(self, request, **kwargs):
-        kwargs = self.get_response_kwargs(request)
         print(request.POST)
-        body = request.POST.get('Body', '')
-        sid = self.get_sid(request)
-        organization = Organization.objects.get(
-            id=self.kwargs.get('pk'))
-        response = Response.objects.create(
-            body=body,
-            
-            sid=sid,
-            
-            recording=request.POST.get('RecordingUrl', ''),
-        )
-        response.find_contact()
+        resp_kwargs = self.get_response_kwargs(request)
+        response = Response.objects.create(**resp_kwargs)
+        response.add_contact()
         response.forward()
         resp = MessagingResponse()
         resp.message(organization.response_msg)
