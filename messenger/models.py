@@ -106,11 +106,13 @@ class Message(models.Model):
     VOICE = 'voice'
     EMAIL = 'email'
     WHATSAPP = 'whatsapp'
+    MIXED = 'mixed'
     MEDIUM_CHOICES = (
         (SMS, 'SMS'),
         (VOICE, 'Voice'),
         (EMAIL, 'Email'),
         (WHATSAPP, 'WhatsApp'),
+        (MIXED, 'Mixed'),
     )
     body = models.CharField(max_length=255)
     method = models.CharField(max_length=50, 
@@ -244,8 +246,11 @@ class Response(models.Model):
                 'from_':self.phone,
                 'to': self.organization.forward_phone
             }
-            message = client.messages.create(**kwargs)
-            return True
+            try:
+                message = client.messages.create(**kwargs)
+                return True
+            except Exception as error:
+                print(error)
         return False
 
 class Note(models.Model):
