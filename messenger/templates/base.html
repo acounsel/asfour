@@ -18,6 +18,15 @@
     <script type="text/javascript" src="{% static 'js/footable.min.js' %}"></script>
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <style>
+      h1, h2, h3, h4, h5, p, th, td {
+        color: #5D5D5D;
+      }
+      h1, h2, h3, h4, h5 {
+        font-family: 'Montserrat', sans-serif;
+      }
+      main {
+        padding-bottom: 5rem;
+      }
       .Messages {
         position: relative;
         width: 100%;
@@ -54,7 +63,7 @@
       {% block header %}
       {% endblock %}
     </header>
-    <main style="min-height: 700px;">
+    <main class="bg-light" style="min-height: 700px;">
       {% block main %}
         <div class="py-5 w-75 w-100-r mx-auto mb-5">
         {% block body %}
@@ -77,7 +86,8 @@
     </script>
     <footer class="footer bg-dark py-5">
       <div class="container">
-        <div class="text-muted text-center mx-auto">© 2020 Copyright: <strong><a class="text-muted" href="http://www.accountabilitycounsel.org/">Accountability Counsel</a><!-- <a class="text-muted" href="http://araborganizing.org/">Arab Resource &amp; Organizing Center</a></strong></div>
+        <div class="text-muted text-center mx-auto">© 2020 Copyright: <strong><a class="text-muted" href="http://www.accountabilitycounsel.org/">Accountability Counsel</a></strong>
+        </div>
       </div>
     </footer>
   </body>
