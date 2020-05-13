@@ -245,9 +245,9 @@ class Response(models.Model):
             client = Client(account_sid, auth_token)
             kwargs = {
                 'body':'msg from {}: {}'.format(
-                    self.phone, self.body)
+                    self.phone, self.body),
                 'from_':self.organization.phone,
-                'to': self.organization.forward_phone
+                'to': self.organization.forward_phone,
             }
             try:
                 message = client.messages.create(**kwargs)
