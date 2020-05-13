@@ -6,6 +6,8 @@ from asfour.storage_backends import PrivateMediaStorage
 from asfour.storage_backends import PublicMediaStorage
 from twilio.rest import Client
 
+from .functions import send_email
+
 class Organization(models.Model):
 
     name = models.CharField(max_length=255)
@@ -242,8 +244,9 @@ class Response(models.Model):
             self.organization.get_credentials()
             client = Client(account_sid, auth_token)
             kwargs = {
-                'body':self.body,
-                'from_':self.phone,
+                'body':'msg from {}: {}'.format(
+                    self.phone, self.body)
+                'from_':self.organization.phone,
                 'to': self.organization.forward_phone
             }
             try:
@@ -251,6 +254,12 @@ class Response(models.Model):
                 return True
             except Exception as error:
                 print(error)
+        if self.organization.forward_email:
+            send_email(
+                to=self.organization.forward_email,
+                subject='Incoming SMS',
+                content='<p>{}</p>'.format(self.body)
+            )
         return False
 
 class Note(models.Model):
