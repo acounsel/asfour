@@ -239,6 +239,7 @@ class Response(models.Model):
         self.save()
 
     def forward(self):
+        result = False
         if self.organization.forward_phone:
             account_sid, auth_token, phone = \
             self.organization.get_credentials()
@@ -251,7 +252,7 @@ class Response(models.Model):
             }
             try:
                 message = client.messages.create(**kwargs)
-                return True
+                result = True
             except Exception as error:
                 print(error)
         if self.organization.forward_email:
@@ -260,7 +261,8 @@ class Response(models.Model):
                 subject='Incoming SMS',
                 content='<p>{}</p>'.format(self.body)
             )
-        return False
+            result = True
+        return result
 
 class Note(models.Model):
 

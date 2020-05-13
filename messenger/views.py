@@ -332,15 +332,16 @@ class VoiceCall(View):
 class HarvestResponse(View):
 
     def post(self, request, **kwargs):
-        print(request.POST)
         org = Organization.objects.get(
             id=self.kwargs.get('pk'))
         resp_kwargs = self.get_response_kwargs(request, org)
-        response = Response.objects.create(**resp_kwargs)
-        response.add_contact()
-        response.forward()
-        resp = MessagingResponse()
-        resp.message(org.response_msg)
+        if resp_kwargs:
+            response = Response.objects.create(**resp_kwargs)
+            print(request.POST)
+            response.add_contact()
+            response.forward()
+            resp = MessagingResponse()
+            resp.message(org.response_msg)
         return HttpResponse(str(resp))
 
     def get_response_kwargs(self, request, organization):
@@ -353,6 +354,9 @@ class HarvestResponse(View):
             kwargs['sid'] = request.POST.get('MessageSid')
             kwargs['body'] = request.POST.get('Body', '')
         elif medium == 'voice':
+            print(request.POST.get('CallStatus'))
+            if 'ringing' in request.POST.get('CallStatus'):
+                return False
             kwargs['sid'] = request.POST.get('CallSid')
             kwargs['recording'] = request.POST.get(
                 'RecordingUrl', '')
