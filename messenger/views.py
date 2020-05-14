@@ -337,12 +337,16 @@ class HarvestResponse(View):
         resp_kwargs = self.get_response_kwargs(request, org)
         if resp_kwargs:
             response = Response.objects.create(**resp_kwargs)
-            print(request.POST)
             response.add_contact()
-            response.forward()
-            resp = MessagingResponse()
-            resp.message(org.response_msg)
-        return HttpResponse(str(resp))
+            print(request.POST)
+            if self.kwargs.get('medium') == 'message':
+                resp = self.sms_forward_and_respond(
+                    org, response)
+            elif self.kwargs.get('medium') == 'voice':
+                resp = self.voice_foward_and_log(
+                    org, response)
+            return HttpResponse(str(resp))
+        return None
 
     def get_response_kwargs(self, request, organization):
         medium = self.kwargs.get('medium')
@@ -361,6 +365,23 @@ class HarvestResponse(View):
             kwargs['recording'] = request.POST.get(
                 'RecordingUrl', '')
         return kwargs
+
+    def sms_forward_and_respond(self, org, response):
+        response.forward()
+        resp = MessagingResponse()
+        resp.message(org.response_msg)
+        return resp
+
+    def voice_forward_and_log(self, org, response):
+        resp = VoiceResponse()
+        resp.say('Thank you for calling. \
+            Please leave a message after the tone.', 
+            voice='alice')  
+        resp.record()  
+        resp.say('Thank you for your message. Goodbye.', 
+            voice='alice')  
+        resp.hangup()
+        return resp
 
 class OrganizationUpdate(AdminMixin, SuccessMessageMixin, 
     UpdateView):
