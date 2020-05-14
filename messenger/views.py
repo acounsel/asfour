@@ -343,7 +343,7 @@ class HarvestResponse(View):
                 resp = self.sms_forward_and_respond(
                     org, response)
             elif self.kwargs.get('medium') == 'voice':
-                resp = self.voice_foward_and_log(
+                resp = self.voice_forward_and_log(
                     org, response)
             return HttpResponse(str(resp))
         return HttpResponse(200)
