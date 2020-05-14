@@ -346,7 +346,7 @@ class HarvestResponse(View):
                 resp = self.voice_foward_and_log(
                     org, response)
             return HttpResponse(str(resp))
-        return None
+        return HttpResponse(200)
 
     def get_response_kwargs(self, request, organization):
         medium = self.kwargs.get('medium')
@@ -359,8 +359,8 @@ class HarvestResponse(View):
             kwargs['body'] = request.POST.get('Body', '')
         elif medium == 'voice':
             print(request.POST.get('CallStatus'))
-            if 'ringing' in request.POST.get('CallStatus'):
-                return False
+            # if 'ringing' in request.POST.get('CallStatus'):
+            #     return False
             kwargs['sid'] = request.POST.get('CallSid')
             kwargs['recording'] = request.POST.get(
                 'RecordingUrl', '')
