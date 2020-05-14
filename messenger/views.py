@@ -332,23 +332,27 @@ class VoiceCall(View):
 class HarvestResponse(View):
 
     def post(self, request, **kwargs):
+        resp = 200
         org = Organization.objects.get(
             id=self.kwargs.get('pk'))
-        resp_kwargs = self.get_response_kwargs(request, org)
-        if resp_kwargs:
+        resp_kwargs, save = self.get_response_kwargs(
+            request, org)
+        if save:
             response = Response.objects.create(**resp_kwargs)
             response.add_contact()
-            print(request.POST)
+
             if self.kwargs.get('medium') == 'message':
                 resp = self.sms_forward_and_respond(
                     org, response)
-            elif self.kwargs.get('medium') == 'voice':
-                resp = self.voice_forward_and_log(
-                    org, response)
-            return HttpResponse(str(resp))
-        return HttpResponse(200)
+        if self.kwargs.get('medium') == 'voice':
+            if request.POST.get('CallStatus') == 'completed':
+                response.forward_voice()
+            else:
+                resp = self.voice_forward_and_log(org)
+        return HttpResponse(resp)
 
     def get_response_kwargs(self, request, organization):
+        save = False
         medium = self.kwargs.get('medium')
         kwargs = {
             'organization': organization,
@@ -357,31 +361,32 @@ class HarvestResponse(View):
         if medium == 'message':
             kwargs['sid'] = request.POST.get('MessageSid')
             kwargs['body'] = request.POST.get('Body', '')
+            save = True
         elif medium == 'voice':
-            print(request.POST.get('CallStatus'))
+            if request.POST.get('CallStatus') == 'completed':
+                save = True
             # if 'ringing' in request.POST.get('CallStatus'):
             #     return False
             kwargs['sid'] = request.POST.get('CallSid')
             kwargs['recording'] = request.POST.get(
                 'RecordingUrl', '')
-        return kwargs
+        return kwargs, save
 
     def sms_forward_and_respond(self, org, response):
-        response.forward()
+        response.forward_sms()
         resp = MessagingResponse()
         resp.message(org.response_msg)
-        return resp
+        return str(resp)
 
-    def voice_forward_and_log(self, org, response):
+    def voice_forward_and_log(self, org):
         resp = VoiceResponse()
-        resp.say('Thank you for calling. \
-            Please leave a message after the tone.', 
+        resp.say('Please leave a message after the tone, then press the pound key.', 
             voice='alice')  
         resp.record()  
         resp.say('Thank you for your message. Goodbye.', 
             voice='alice')  
         resp.hangup()
-        return resp
+        return str(resp)
 
 class OrganizationUpdate(AdminMixin, SuccessMessageMixin, 
     UpdateView):

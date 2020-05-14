@@ -238,7 +238,7 @@ class Response(models.Model):
         self.contact = contact
         self.save()
 
-    def forward(self):
+    def forward_sms(self):
         result = False
         if self.organization.forward_phone:
             account_sid, auth_token, phone = \
@@ -260,6 +260,31 @@ class Response(models.Model):
                 to=self.organization.forward_email,
                 subject='Incoming SMS',
                 content='<p>{}</p>'.format(self.body)
+            )
+            result = True
+        return result
+
+    def forward_voice(self):
+        if self.organization.forward_phone:
+            account_sid, auth_token, phone = \
+            self.organization.get_credentials()
+            client = Client(account_sid, auth_token)
+            kwargs = {
+                'body':'voice msg from {}: {}'.format(
+                    self.phone, self.recording),
+                'from_':self.organization.phone,
+                'to': self.organization.forward_phone,
+            }
+            try:
+                message = client.messages.create(**kwargs)
+                result = True
+            except Exception as error:
+                print(error)
+        if self.organization.forward_email:
+            send_email(
+                to=self.organization.forward_email,
+                subject='Incoming Voice Msg',
+                content='<p>{}</p>'.format(self.recording)
             )
             result = True
         return result
