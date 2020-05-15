@@ -83,6 +83,9 @@ class Contact(models.Model):
     has_consented = models.BooleanField(default=False)
     has_whatsapp = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ('first_name',)
+
     def __str__(self):
         return '{0} {1}'.format(
             self.first_name, self.last_name)
