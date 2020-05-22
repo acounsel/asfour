@@ -119,7 +119,7 @@ class Message(models.Model):
         (WHATSAPP, 'WhatsApp'),
         (MIXED, 'Mixed'),
     )
-    body = models.CharField(max_length=255)
+    body = models.TextField()
     method = models.CharField(max_length=50, 
         choices=MEDIUM_CHOICES, default=SMS)
     attachment = models.FileField(
