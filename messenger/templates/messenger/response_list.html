@@ -16,7 +16,7 @@
     <tbody>
       {% for response in response_list %}
       <tr>
-        <th scope="row"><a href="{{ response.get_absolute_url }}">{{ response.body }}</a></th>
+        <th scope="row"><a href="{{ response.get_absolute_url }}">{% if response.body %}{{ response.body }}{% else %}{{ response.recording }}{% endif %}</a></th>
         <td>{{ response.phone }}</td>
         <td>{{ response.date_received }}</td>
       </tr>
