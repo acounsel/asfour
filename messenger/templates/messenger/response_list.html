@@ -16,8 +16,8 @@
     <tbody>
       {% for response in response_list %}
       <tr>
-        <th scope="row"><a href="{{ response.get_absolute_url }}">{% if response.body %}{{ response.body }}{% else %}{{ response.recording }}{% endif %}</a></th>
-        <td>{{ response.phone }}</td>
+        <th scope="row">{% if response.body %}<a href="{{ response.get_absolute_url }}">{{ response.body }}</a>{% elif response.recording %}<a href="{{ response.recording }}">Voice Message</a>{% endif %}</th>
+        <td><a href="{{ response.contact.get_absolute_url }}">{{ response.phone }}</a></td>
         <td>{{ response.date_received }}</td>
       </tr>
       {% endfor %}
