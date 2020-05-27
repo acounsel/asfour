@@ -90,6 +90,11 @@ class Contact(models.Model):
         return '{0} {1}'.format(
             self.first_name, self.last_name)
 
+    def save(self, *args, **kwargs):
+        if '+' not in self.phone:
+            self.phone = '+1' + self.phone
+        super(Contact, self).save(*args, **kwargs)
+
     def get_absolute_url(self):
         return reverse('contact-detail', 
             kwargs={'pk':self.id})
@@ -153,8 +158,12 @@ class Message(models.Model):
         sender_client = self.get_client_verb(client)
         for contact in self.contacts.all():
             kwargs['to'] = contact.phone
-            message = sender_client.create(**kwargs)
-            self.log_message(contact, request)
+            try:
+                message = sender_client.create(**kwargs)
+                error = None
+            except Exception as e:
+                error = e
+            self.log_message(contact, request, error)
         return True
 
     def get_kwargs(self, phone, request):
@@ -179,7 +188,7 @@ class Message(models.Model):
             verb = 'calls'
         return getattr(client, verb)
 
-    def log_message(self, contact, request=None):
+    def log_message(self, contact, request=None, error=None):
         log = MessageLog.objects.create(
             message=self,
             organization=self.organization,
@@ -187,12 +196,23 @@ class Message(models.Model):
         )
         if request:
             log.sender = request.user.userprofile
+        if error:
+            log.status = MessageLog.FAILED
+            log.error = error
         log.save()
+        return log
 
 class MessageLog(models.Model):
-
+    SUCCESS = 'success'
+    FAILED = 'failed'
+    STATUS_CHOICES = (
+        (SUCCESS, 'Success'),
+        (FAILED, 'Failed'),
+    )
     message = models.ForeignKey(Message, 
         on_delete=models.CASCADE)
+    status = models.CharField(max_length=40, 
+        choices=STATUS_CHOICES, default=SUCCESS)
     organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE)
     contact = models.ForeignKey(Contact, 
@@ -200,6 +220,7 @@ class MessageLog(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     sender = models.ForeignKey(UserProfile,
         on_delete=models.SET_NULL, blank=True, null=True)
+    error = models.TextField(blank=True)
 
     def __str__(self):
         return '{0} sent to {1} on {2}'.format(
@@ -231,6 +252,9 @@ class Response(models.Model):
     date_received = models.DateTimeField(auto_now_add=True)
     organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ('-date_received',)
 
     def __str__(self):
         return self.body

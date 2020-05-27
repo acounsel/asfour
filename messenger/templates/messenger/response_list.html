@@ -9,6 +9,7 @@
     <thead>
       <tr>
         <th scope="col">Text</th>
+        <th scope="col">Contact</th>
         <th scope="col">Phone Number</th>
         <th scope="col">Date Received</th>
       </tr>
@@ -17,6 +18,7 @@
       {% for response in response_list %}
       <tr>
         <th scope="row">{% if response.body %}<a href="{{ response.get_absolute_url }}">{{ response.body }}</a>{% elif response.recording %}<a href="{{ response.recording }}">Voice Message</a>{% endif %}</th>
+        <td><a href="{{ response.contact.get_absolute_url }}">{{ response.contact }}</a></td>
         <td><a href="{{ response.contact.get_absolute_url }}">{{ response.phone }}</a></td>
         <td>{{ response.date_received }}</td>
       </tr>

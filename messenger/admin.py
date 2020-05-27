@@ -33,12 +33,16 @@ class ContactAdmin(admin.ModelAdmin):
         'first_name', 
         'last_name', 
         'organization', 
+        'phone',
+        'email',
         'preferred_method',
     )
     list_display_links = (
         'first_name', 
         'last_name', 
         'organization', 
+        'phone',
+        'email',
         'preferred_method',
     )
     list_filter = ('organization', 'preferred_method')
