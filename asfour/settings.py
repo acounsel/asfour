@@ -12,6 +12,8 @@ INSTALLED_APPS = [
     'django_extensions',
     'crispy_forms',
     'messenger',
+    'django_celery_beat',
+    'django_celery_results',
 ]
 
 DEBUG = True
@@ -19,6 +21,14 @@ DEBUG = True
 ALLOWED_HOSTS = ['0.0.0.0', 'localhost']
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+#CELERY_BROKER_URL = 
+CELERY_TIMEZONE = 'UTC'
+CELERY_ENABLE_UTC = True
+# CELERY_RESULT_BACKEND = 'django-db'
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+CELERY_IMPORTS = ('messenger.tasks')
+# CELERY_RESULT_BACKEND = 'django-db'
 
 TEMPLATEDIRS = ['templates', '/templates']
 
@@ -97,6 +107,13 @@ USE_TZ = True
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
+CACHES = {
+"default": {
+"BACKEND": "redis_cache.RedisCache",
+"LOCATION": os.environ.get('REDIS_URL'),
+}
+}
+
 
 try:
     from .local_settings import *
@@ -109,5 +126,6 @@ except Exception as e:
     DEFAULT_FILE_STORAGE = 'zwazo.storage_backends.PublicMediaStorage'
     AWS_PRIVATE_MEDIA_LOCATION = 'media/private'
     PRIVATE_FILE_STORAGE = 'zwazo.storage_backends.PrivateMediaStorage'
+    BROKER_URL = os.environ.get("REDIS_URL")
 # Activate Django-Heroku.
 django_heroku.settings(locals())

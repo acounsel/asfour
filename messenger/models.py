@@ -6,7 +6,7 @@ from asfour.storage_backends import PrivateMediaStorage
 from asfour.storage_backends import PublicMediaStorage
 from twilio.rest import Client
 
-from .functions import send_email
+from .tasks import task_send_message
 
 class Organization(models.Model):
 
@@ -221,6 +221,8 @@ class MessageLog(models.Model):
     sender = models.ForeignKey(UserProfile,
         on_delete=models.SET_NULL, blank=True, null=True)
     error = models.TextField(blank=True)
+    async_task_id = models.CharField(max_length=255, default = '')
+    is_finished = models.BooleanField(default=False)
 
     def __str__(self):
         return '{0} sent to {1} on {2}'.format(
@@ -308,7 +310,7 @@ class Response(models.Model):
             except Exception as error:
                 print(error)
         if self.organization.forward_email:
-            send_email(
+            task_send_message.delay(
                 to=self.organization.forward_email,
                 subject='Incoming Voice Msg',
                 content='<p>{}</p>'.format(self.recording)

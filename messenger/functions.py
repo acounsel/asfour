@@ -11,7 +11,7 @@ def get_settings_value(name):
         value = os.environ.get(name)
     return value
 
-def send_email(to, subject, content):
+def send_email(to, subject, content, current_task):
     message = Mail(
         from_email='admin@asfour.com',
         to_emails=to,
@@ -27,3 +27,17 @@ def send_email(to, subject, content):
     except Exception as e:
         print('ERROR')
         print(e.message)
+
+def update_status(current_task, current_stage, display_message):
+    """
+    Given a task, a given stage and optional dispaly message, this function will update the celery worker state
+    """
+    current_task.update_state(
+        state='PROGRESS',
+        meta={
+            'current': current_stage,
+            'total': 9,
+            'percent': int((float(current_stage) / 9) * 100),
+            'message': display_message
+        }
+    )
