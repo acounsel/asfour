@@ -1,5 +1,6 @@
 import django_heroku
 import os
+#from .local_settings import BROKER_URL
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -22,12 +23,12 @@ ALLOWED_HOSTS = ['0.0.0.0', 'localhost']
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-#CELERY_BROKER_URL = 
-CELERY_TIMEZONE = 'UTC'
-CELERY_ENABLE_UTC = True
+#CELERY_BROKER_URL = BROKER_URL
+#CELERY_TIMEZONE = 'UTC'
+#CELERY_ENABLE_UTC = True
 # CELERY_RESULT_BACKEND = 'django-db'
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
-CELERY_IMPORTS = ('messenger.tasks')
+#CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+#CELERY_IMPORTS = ('messenger.tasks')
 # CELERY_RESULT_BACKEND = 'django-db'
 
 TEMPLATEDIRS = ['templates', '/templates']
@@ -104,15 +105,17 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 CACHES = {
-"default": {
-"BACKEND": "redis_cache.RedisCache",
-"LOCATION": os.environ.get('REDIS_URL'),
+    "default": {
+        "BACKEND": "redis_cache.RedisCache",
+        "LOCATION": os.environ.get('REDIS_URL'),
+    }
 }
-}
+
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 
 try:
@@ -126,6 +129,10 @@ except Exception as e:
     DEFAULT_FILE_STORAGE = 'zwazo.storage_backends.PublicMediaStorage'
     AWS_PRIVATE_MEDIA_LOCATION = 'media/private'
     PRIVATE_FILE_STORAGE = 'zwazo.storage_backends.PrivateMediaStorage'
-    BROKER_URL = os.environ.get("REDIS_URL")
+    CELERY_BROKER_URL = os.environ.get('REDIS_URL')
+    CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL')
+    CELERY_ACCEPT_CONTENT = ['application/json']
+    CELERY_TASK_SERIALIZER = 'json'
+    CELERY_RESULT_SERIALIZER = 'json'
 # Activate Django-Heroku.
 django_heroku.settings(locals())

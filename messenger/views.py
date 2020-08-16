@@ -26,7 +26,6 @@ from .models import Message, MessageLog, Response, Note
 
 from twilio.twiml.voice_response import VoiceResponse
 from twilio.twiml.messaging_response import MessagingResponse
-from messenger import tasks
 from messenger import models
 from messenger import forms
 

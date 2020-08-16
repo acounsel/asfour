@@ -11,7 +11,7 @@ def get_settings_value(name):
         value = os.environ.get(name)
     return value
 
-def send_email(to, subject, content, current_task):
+def send_email(to, subject, content):
     message = Mail(
         from_email='admin@asfour.com',
         to_emails=to,

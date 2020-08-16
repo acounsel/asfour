@@ -1,5 +1,10 @@
 Boto3
+redis
+celery
 django
+django_celery_beat
+django_celery_results
+django_redis_cache
 django-crispy-forms
 django-extensions
 django-heroku
