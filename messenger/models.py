@@ -6,7 +6,7 @@ from asfour.storage_backends import PrivateMediaStorage
 from asfour.storage_backends import PublicMediaStorage
 from twilio.rest import Client
 
-from .tasks import task_send_message
+from .tasks import task_send_email
 
 class Organization(models.Model):
 
@@ -310,7 +310,7 @@ class Response(models.Model):
             except Exception as error:
                 print(error)
         if self.organization.forward_email:
-            task_send_message.delay(
+            task_send_email.delay(
                 to=self.organization.forward_email,
                 subject='Incoming Voice Msg',
                 content='<p>{}</p>'.format(self.recording)

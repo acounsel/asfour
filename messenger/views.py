@@ -23,6 +23,7 @@ from .forms import OrganizationForm
 from .functions import send_email
 from .models import Organization, UserProfile, Contact, Tag
 from .models import Message, MessageLog, Response, Note
+from .tasks import task_send_message
 
 from twilio.twiml.voice_response import VoiceResponse
 from twilio.twiml.messaging_response import MessagingResponse
@@ -286,13 +287,8 @@ class MessageDelete(MessageView, OrgDeleteView):
 
 class MessageSend(MessageDetail):
 
-    def get(self, request, **kwargs):
-        response = super().get(request, **kwargs)
-        context = self.get_context_data(**kwargs)
-        message = self.get_object()
-        message.send(request)
-        messages.success(request, 'Message Sent!')
-        return redirect(reverse('home'))
+    def send(self, request, **kwargs):
+       return task_send_message.delay(self, request, **kwargs)
 
 class MessageLogList(OrgListView):
     model = MessageLog
