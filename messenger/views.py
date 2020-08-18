@@ -287,8 +287,13 @@ class MessageDelete(MessageView, OrgDeleteView):
 
 class MessageSend(MessageDetail):
 
-    def send(self, request, **kwargs):
-       return task_send_message.delay(self, request, **kwargs)
+    def get(self, request, **kwargs):
+        response = super().get(request, **kwargs)
+        context = self.get_context_data(**kwargs)
+        message = self.get_object()
+        message.send(request)
+        messages.success(request, 'Message Sent!')
+        return redirect(reverse('home'))
 
 class MessageLogList(OrgListView):
     model = MessageLog

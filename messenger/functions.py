@@ -28,13 +28,13 @@ def send_email(to, subject, content):
         print('ERROR')
         print(e.message)
 
-def send_message(self, request, **kwargs):
-        response = super().get(request, **kwargs)
-        context = self.get_context_data(**kwargs)
-        message = self.get_object()
-        message.send(request)
-        messages.success(request, 'Message Sent!')
-        return redirect(reverse('home'))
+def send_message(request, **kwargs):
+    response = super().get(request, **kwargs)
+    context = self.get_context_data(**kwargs)
+    message = self.get_object()
+    message.send(request)
+    messages.success(request, 'Message Sent!')
+    return redirect(reverse('home'))
 
 def update_status(current_task, current_stage, display_message):
     """

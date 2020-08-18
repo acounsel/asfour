@@ -6,7 +6,7 @@ from asfour.storage_backends import PrivateMediaStorage
 from asfour.storage_backends import PublicMediaStorage
 from twilio.rest import Client
 
-from .tasks import task_send_email
+from .tasks import task_send_email, send_messages
 
 class Organization(models.Model):
 
@@ -151,42 +151,39 @@ class Message(models.Model):
             kwargs={'pk':self.id})
 
     def send(self, request=None):
-        account_sid, auth_token, phone = self.organization \
-        .get_credentials()
-        client = Client(account_sid, auth_token)
-        kwargs = self.get_kwargs(phone, request)
-        sender_client = self.get_client_verb(client)
-        for contact in self.contacts.all():
-            kwargs['to'] = contact.phone
-            try:
-                message = sender_client.create(**kwargs)
-                error = None
-            except Exception as e:
-                error = e
-            self.log_message(contact, request, error)
+        kwargs = {
+            'msg_id': self.id,
+        }
+        if self.method == 'voice':
+            kwargs['voice_uri'] = self.get_voice_uri(request)
+        send_messages.delay(msg_id=self.id)
+        # self.log_message(contact, request, error)
         return True
 
-    def get_kwargs(self, phone, request):
+    def get_kwargs(self, phone, voice_uri):
         kwargs = {'from_':phone,}
-        if self.method == self.SMS:
+        if voice_uri:
+            kwargs['url'] = voice_uri
+        else:
             kwargs['body'] = self.body
             if self.attachment:
                 kwargs['media_url'] = [self.attachment.url]
-        else:
-            kwargs['url'] = request.build_absolute_uri(
-                reverse('voice-call', kwargs={
-                    'pk': self.organization.id,
-                    'msg_id': self.id
-                })
-            )
         return kwargs
 
-    def get_client_verb(self, client):
+    def get_voice_uri(self, request):
+        return request.build_absolute_uri(
+            reverse('voice-call', kwargs={
+                'pk': self.organization.id,
+                'msg_id': self.id
+            })
+        )
+
+    def get_client_verb(self):
         if self.method == self.SMS:
             verb = 'messages'
         else:
             verb = 'calls'
-        return getattr(client, verb)
+        return verb
 
     def log_message(self, contact, request=None, error=None):
         log = MessageLog.objects.create(
