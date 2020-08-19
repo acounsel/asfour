@@ -23,7 +23,7 @@ from .forms import OrganizationForm
 from .functions import send_email
 from .models import Organization, UserProfile, Contact, Tag
 from .models import Message, MessageLog, Response, Note
-from .tasks import task_send_message
+from .tasks import send_messages
 
 from twilio.twiml.voice_response import VoiceResponse
 from twilio.twiml.messaging_response import MessagingResponse
