@@ -19,43 +19,21 @@ def task_send_email(to, subject, content):
     return 'done'
 
 @app.task
-def task_send_message(request, **kwargs):
-     #allows for the front end to load before displaying stuff
-    time.sleep(1)
-    functions.send_message(self, request, **kwargs)
-    return 'done'
+def message_log(MessageLog, message, contact, user_profile, error):
+	log = MessageLog.objects.create(
+            message=message,
+            organization=message.organization,
+            contact=contact)
+ 	if user_profile:
+        log.sender = user_profile
+    if error:
+        log.status = MessageLog.FAILED
+        log.error = error
+ 	return log
+
 
 @app.task
-def send_test_message(message):
-     #allows for the front end to load before displaying stuff
-    time.sleep(1)
-    message.send()
-    return 'done'
-
-# @app.task
-# def send_message(sid, token, from_phone, to_phone, message):
-#     client = Client(sid, token)
-#     client.messages.create(**{
-#         'from_': from_phone,
-#         'to': to_phone,
-#         'body': message,
-#     })
-#     return 'done'
-
-# @app.task
-# def send_messages(numbers, sid, token, verb, send_dict):
-#     MessageLog = apps.get_model(app_label='messenger', 
-#         model_name='MessageLog')
-#     for numbers in numbers:
-#         try:
-#             send_dict['to'] = number
-#             send_message(sid, token, verb, send_dict)
-#             error = None
-#         except Exception as e:
-#             error = e
-
-@app.task
-def send_messages(msg_id, voice_uri=None):
+def send_messages(msg_id, voice_uri=None, user_profile=None):
     Message = apps.get_model(app_label='messenger', 
         model_name='Message')
     MessageLog = apps.get_model(app_label='messenger', 
@@ -74,8 +52,5 @@ def send_messages(msg_id, voice_uri=None):
             error = None
         except Exception as e:
             error = e
-        MessageLog.objects.create(
-            message=message,
-            organization=message.organization,
-            contact=contact)
-
+       log = message_log(MessageLog, message, contact, user_profile, error)
+       log.save()
