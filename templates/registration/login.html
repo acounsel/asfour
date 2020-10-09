@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
 
 {% block body %}
   <div class="container-fluid">
-    <div class="card mx-auto mt-5 p-4 w-50">
+    <div class="card mx-auto mt-5 p-4" style="max-width:400px;">
       <h2>Login</h2>
       <form class="Form mt-4" method="post">
         {% csrf_token %}
         {% for field in form %}
           <div class="form-group row align-items-center">
-            <label for="{{ field.name }}" class="col-sm-4 col-form-label">{{ field.label }}</label>
-            <div class="col-sm-8">
-              {{ field }}
+            <div class="col-sm-12">
+              {{ field|as_crispy_field }}
             </div>
               {% if field.errors %}
               {{ field.errors }}
@@ -18,10 +18,13 @@
           </div>
         {% endfor %}
         <div class="form-group row align-items-center">
-          <div class="col-sm-4 mx-auto mt-5">
+          <div class="col-sm-6 mt-5">
             <button type="submit" class="btn btn-primary btn-login btn-block">Login</button>
           </div>
+          <div class="col-sm-6 mt-5">
+            <a href="{% url 'password_reset' %}" class="btn btn-secondary btn-block">Forgot Password</a>
         </div>
       </form>
+    </div>
   </div>
 {% endblock %}

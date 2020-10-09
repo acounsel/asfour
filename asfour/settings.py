@@ -15,11 +15,14 @@ INSTALLED_APPS = [
     'messenger',
     'django_celery_beat',
     'django_celery_results',
+    'debug_toolbar',
 ]
 
 DEBUG = True
 
 ALLOWED_HOSTS = ['0.0.0.0', 'localhost']
+
+INTERNAL_IPS = ['127.0.0.1', 'localhost']
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -34,6 +37,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATEDIRS = ['templates', '/templates']
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -41,6 +45,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'asfour.urls'
@@ -105,8 +110,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
-
 CACHES = {
     "default": {
         "BACKEND": "redis_cache.RedisCache",
@@ -134,5 +137,6 @@ except Exception as e:
     CELERY_ACCEPT_CONTENT = ['application/json']
     CELERY_TASK_SERIALIZER = 'json'
     CELERY_RESULT_SERIALIZER = 'json'
+
 # Activate Django-Heroku.
 django_heroku.settings(locals())
