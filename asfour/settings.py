@@ -24,6 +24,11 @@ ALLOWED_HOSTS = ['0.0.0.0', 'localhost', '.3asfour.com']
 
 INTERNAL_IPS = ['127.0.0.1', 'localhost']
 
+ADMINS = (
+    ('Samer', 'samer@accountabilitycounsel.org'),
+    ('Marisa', 'marisa@accountabilitycounsel.org')
+)
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 #CELERY_BROKER_URL = BROKER_URL
