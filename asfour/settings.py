@@ -18,7 +18,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
 ]
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['0.0.0.0', 'localhost', '.3asfour.com']
 
