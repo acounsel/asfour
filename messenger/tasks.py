@@ -20,16 +20,16 @@ def task_send_email(to, subject, content):
 
 @app.task
 def message_log(MessageLog, message, contact, user_profile, error):
-	log = MessageLog.objects.create(
+    log = MessageLog.objects.create(
             message=message,
             organization=message.organization,
             contact=contact)
- 	if user_profile:
+    if user_profile:
         log.sender = user_profile
     if error:
         log.status = MessageLog.FAILED
         log.error = error
- 	return log
+    return log
 
 
 @app.task
@@ -52,5 +52,5 @@ def send_messages(msg_id, voice_uri=None, user_profile=None):
             error = None
         except Exception as e:
             error = e
-       log = message_log(MessageLog, message, contact, user_profile, error)
-       log.save()
+        log = message_log(MessageLog, message, contact, user_profile, error)
+        log.save()
