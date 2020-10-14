@@ -14,7 +14,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'messenger',
     'django_celery_beat',
-    # 'django_celery_results',
+    'django_celery_results',
     'debug_toolbar',
 ]
 
