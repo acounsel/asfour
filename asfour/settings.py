@@ -142,6 +142,13 @@ except Exception as e:
     CELERY_ACCEPT_CONTENT = ['application/json']
     CELERY_TASK_SERIALIZER = 'json'
     CELERY_RESULT_SERIALIZER = 'json'
+    SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
+    EMAIL_HOST = 'smtp.sendgrid.net'
+    EMAIL_PORT = 587
+    EMAIL_HOST_USER = 'apikey'
+    EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
+    EMAIL_USE_TLS = True
+    SERVER_EMAIL = 'noreply@3asfour.com'
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())
