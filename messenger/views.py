@@ -2,6 +2,7 @@ import csv
 import io
 
 from django.apps import apps
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
@@ -87,19 +88,20 @@ class Home(View):
     template_name = 'home.html'
 
     def get_context_data(self, **kwargs):
+        context = {
+            'captcha_key': settings.RECAPTCHA_API_KEY,
+        }
         if hasattr(self.request.user, 'userprofile'):
             org = self.request.user.userprofile.organization
             kwargs = {'organization': org,}
-            context = {
+            context.update({
                 'contact_list': Contact.objects.filter(
                     **kwargs),
                 'message_list': Message.objects.filter(
                     **kwargs),
                 'response_list': Response.objects.filter(
                     **kwargs),
-            }
-        else:
-            context = {}
+            })
         return context
 
     def get(self, request, **kwargs):

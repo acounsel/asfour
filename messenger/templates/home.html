@@ -82,8 +82,22 @@
     {% csrf_token %}
     <input type="text" name="name" placeholder="Name" class="form-control mb-4">
     <input type="email" name="email" placeholder="Email" class="form-control mb-4">
+    <input type="hidden" name="recaptcha" id="id_recaptcha">
     <textarea name="body" placeholder="What do you plan to use it for?" class="form-control mb-4"></textarea>
     <input type="submit" value="Submit" class="btn btn-danger px-4">
   </form>
 </div>
+ <script src="https://www.google.com/recaptcha/api.js?render={{ captcha_key }}"></script>
+  <script>
+    grecaptcha.ready(function() {
+      $('form').submit(function(e){
+        var form = this;
+        e.preventDefault()
+        grecaptcha.execute('{{ captcha_key }}', {action: 'signupform'}).then(function(token) {
+          $('form').find('#id_recaptcha').val(token);
+          form.submit();
+        });
+      });
+    });
+  </script>
 {% endblock %}

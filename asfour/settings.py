@@ -1,6 +1,17 @@
 import django_heroku
 import os
+
+from django.core.exceptions import ImproperlyConfigured
 #from .local_settings import BROKER_URL
+
+def get_env_variable(var_name):
+    """Get the environment variable or return exception.""" 
+    try:
+        return os.environ[var_name] 
+    except KeyError:
+        error_msg = 'Set the {} environment 􏰁\
+            variable'.format(var_name)
+    raise ImproperlyConfigured(error_msg)
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -42,15 +53,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATEDIRS = ['templates', '/templates']
 
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
 ]
 
 ROOT_URLCONF = 'asfour.urls'
@@ -129,6 +139,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 try:
     from .local_settings import *
 except Exception as e:
+    print('getting environ vars')
     AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
     AWS_STORAGE_BUCKET_NAME = os.environ.get('S3_BUCKET')
@@ -148,7 +159,11 @@ except Exception as e:
     EMAIL_HOST_USER = 'apikey'
     EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
     EMAIL_USE_TLS = True
+    RECAPTCHA_API_KEY = get_env_variable('RECAPTCHA_API_KEY')
+    RECAPTCHA_SECRET_KEY = get_env_variable('RECAPTCHA_SECRET_KEY')
     SERVER_EMAIL = 'noreply@3asfour.com'
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = False
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())
