@@ -163,7 +163,7 @@ except Exception as e:
     RECAPTCHA_SECRET_KEY = get_env_variable('RECAPTCHA_SECRET_KEY')
     SERVER_EMAIL = 'noreply@3asfour.com'
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = False
+    SECURE_SSL_REDIRECT = True
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())
