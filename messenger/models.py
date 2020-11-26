@@ -156,8 +156,8 @@ class Message(models.Model):
         }
         if self.method == 'voice':
             kwargs['voice_uri'] = self.get_voice_uri(request)
-        if request:
-            kwargs['user_profile'] = request.user.userprofile
+        # if request:
+        #     kwargs['user_profile'] = request.user.userprofile
         send_messages.delay(**kwargs)
         # self.log_message(contact, request, error)
         return True
