@@ -138,6 +138,7 @@ class Message(models.Model):
     organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE)
     request_for_response = models.BooleanField(default=False)
+    # date_created = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return self.body

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block body %}
+<h1>{{ message.get_method_display }} Message</h1>
+<div class="card p-4">
+  <p><a href="{% url 'message-update' pk=message.id %}">Edit</a></p>
+  <h2>{{ message.body }}</h2>
+  {% if message.attachment %}
+  <img src="{{ message.attachment.url }}" class="w-25">
+  {% endif %}
+  {% if message.recording %}
+  <p><a href="{{ message.recording.url }}">Sound File</a></p>
+  {% endif %}
+  <div class="d-flex">
+    <div><a href="{% url 'message-update' pk=message.id %}">Edit</a></div>
+    <div>Recipients</div>
+    <div>Responses</div>
+    <div>Analytics</div>
+  </div>
+  <h3>Sending To:</h3>
+  {% for contact in message.contacts.all %}
+  <p>{{ contact.first_name }} {{ contact.last_name }}: {{ contact.phone }}</p>
+  {% endfor %}
+  <a class="btn btn-primary d-xl-inline-block w-25" href="{% url 'message-send' pk=message.id %}">SEND</a>
+  <div class="mt-5">
+  {% include 'addins/notes.html' %}
+  </div>
+</div>
+{% endblock %}

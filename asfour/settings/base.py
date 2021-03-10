@@ -2,6 +2,8 @@ import django_heroku
 import os
 
 from django.core.exceptions import ImproperlyConfigured
+from pathlib import Path
+from urllib.parse import urlparse
 #from .local_settings import BROKER_URL
 
 def get_env_variable(var_name):
@@ -12,6 +14,27 @@ def get_env_variable(var_name):
         error_msg = 'Set the {} environment 􏰁\
             variable'.format(var_name)
     raise ImproperlyConfigured(error_msg)
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+AWS_ACCESS_KEY_ID = get_env_variable('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = get_env_variable('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = get_env_variable('S3_BUCKET')
+AWS_S3_CUSTOM_DOMAIN = '{}.s3.amazonaws.com'.format(
+    AWS_STORAGE_BUCKET_NAME)
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+AWS_LOCATION = 'static'
+AWS_PUBLIC_MEDIA_LOCATION = 'media/public'
+AWS_PRIVATE_MEDIA_LOCATION = 'media/private'
+
+MEDIA_ROOT = BASE_DIR / 'media'
+STATIC_ROOT = BASE_DIR / 'static_root'
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -26,7 +49,6 @@ INSTALLED_APPS = [
     'messenger',
     'django_celery_beat',
     'django_celery_results',
-    'debug_toolbar',
 ]
 
 DEBUG = True
@@ -84,10 +106,20 @@ TEMPLATES = [
 WSGI_APPLICATION = 'asfour.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-
-
+CELERY_BROKER_URL = os.environ.get('REDIS_URL')
+CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL')
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'apikey'
+EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
+EMAIL_USE_TLS = True
+RECAPTCHA_API_KEY = get_env_variable('RECAPTCHA_API_KEY')
+RECAPTCHA_SECRET_KEY = get_env_variable('RECAPTCHA_SECRET_KEY')
+SERVER_EMAIL = 'noreply@3asfour.com'
 
 
 # Password validation
@@ -134,36 +166,6 @@ CACHES = {
 
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
-
-
-try:
-    from .local_settings import *
-except Exception as e:
-    print('getting environ vars')
-    AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-    AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
-    AWS_STORAGE_BUCKET_NAME = os.environ.get('S3_BUCKET')
-    AWS_S3_CUSTOM_DOMAIN = '{}.s3.amazonaws.com'.format(AWS_STORAGE_BUCKET_NAME)
-    AWS_PUBLIC_MEDIA_LOCATION = 'media/public'
-    DEFAULT_FILE_STORAGE = 'zwazo.storage_backends.PublicMediaStorage'
-    AWS_PRIVATE_MEDIA_LOCATION = 'media/private'
-    PRIVATE_FILE_STORAGE = 'zwazo.storage_backends.PrivateMediaStorage'
-    CELERY_BROKER_URL = os.environ.get('REDIS_URL')
-    CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL')
-    CELERY_ACCEPT_CONTENT = ['application/json']
-    CELERY_TASK_SERIALIZER = 'json'
-    CELERY_RESULT_SERIALIZER = 'json'
-    SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
-    EMAIL_HOST = 'smtp.sendgrid.net'
-    EMAIL_PORT = 587
-    EMAIL_HOST_USER = 'apikey'
-    EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
-    EMAIL_USE_TLS = True
-    RECAPTCHA_API_KEY = get_env_variable('RECAPTCHA_API_KEY')
-    RECAPTCHA_SECRET_KEY = get_env_variable('RECAPTCHA_SECRET_KEY')
-    SERVER_EMAIL = 'noreply@3asfour.com'
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = True
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())
