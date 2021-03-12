@@ -12,7 +12,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Asfour</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
@@ -22,7 +22,6 @@
     <script src="https://kit.fontawesome.com/c12b0758b8.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-footable/3.1.6/footable.min.js"></script>
-    <script type="text/javascript" src="{% static 'js/footable.min.js' %}"></script>
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <style>
       h1, h2, h3, h4, h5, p, th, td {
@@ -33,6 +32,9 @@
       }
       main {
         padding-bottom: 5rem;
+      }
+      .text-dark {
+        color: #5D5D5D !important;
       }
       .Messages {
         position: relative;
@@ -60,6 +62,21 @@
         }
         .Messages.hide {
             display: none;
+        }
+        .MessageDetail .navbar .btn.active a,
+        .MessageDetail .navbar .btn:hover a {
+          color: #FFFFFF!important;
+          text-decoration: none;
+        }
+        .MessageDetail .card {
+          border-radius: 0 0.3rem 0.3rem 0.3rem;
+        }
+        #id_messageNav {
+          padding: .5rem 1rem 0;
+        }
+        #id_messageNav .nav-item {
+          border-radius: 0.3rem 0.3rem 0 0;
+          width: 7rem;
         }
     </style>
   </head>
@@ -95,6 +112,8 @@
     <script type="text/javascript">
       $( '.table' ).footable();
     </script>
+    {% block javascript %}
+    {% endblock %}
     <footer class="footer bg-dark py-5">
       <div class="container">
         <div class="text-muted text-center mx-auto">© 2020 Copyright: <strong><a class="text-muted" href="http://www.accountabilitycounsel.org/">Accountability Counsel</a></strong>

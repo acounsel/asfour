@@ -1,9 +1,9 @@
 {% load crispy_forms_tags %}
-<form class="mt-5 w-50" method="POST" novalidate enctype="multipart/form-data">
+<form class="mt-5 w-50" method="POST" novalidate enctype="multipart/form-data" action="{{ form_action }}">
   {% csrf_token %}
   {{ form|crispy }}
   {{ form.errors  }}
-  <input type="submit" value="Submit" class="btn btn-primary px-4">
+  <input type="submit" value="Save" class="btn btn-primary px-4">
   {% if form.instance %}
   <a href="{{ form.instance.get_delete_url }}" class="btn btn-danger px-4 ml-5">Delete</a>
   {% endif %}

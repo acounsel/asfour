@@ -8,6 +8,7 @@
   <table class="table" data-sorting="true">
     <thead>
       <tr>
+        <th scope="col">Date</th>
         <th scope="col">Text</th>
         <th scope="col">Method</th>
         <th scope="col">Attachment</th>
@@ -17,7 +18,8 @@
     <tbody>
       {% for message in message_list %}
       <tr>
-        <th scope="row"><a href="{{ message.get_absolute_url }}">{{ message.body }}</a></th>
+        <th scope="row">{{ message.date_created }}</th>
+        <td><a href="{{ message.get_absolute_url }}">{{ message.body }}</a></td>
         <td>{{ message.get_method_display }}</td>
         <td>{% if message.recording %}<a href="{{ message.recording.url }}">Recording</a>{% else %}{{ message.attachment }}{% endif %}</td>
         <td>{{ message.contacts.count }}</td>

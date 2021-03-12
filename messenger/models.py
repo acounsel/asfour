@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
@@ -138,7 +140,8 @@ class Message(models.Model):
     organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE)
     request_for_response = models.BooleanField(default=False)
-    # date_created = models.DateField(auto_now_add=True)
+    date_created = models.DateField(auto_now_add=True)
+    date_sent = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return self.body
@@ -151,6 +154,15 @@ class Message(models.Model):
         return reverse('message-delete',
             kwargs={'pk':self.id})
 
+    def next(self):
+        messages = Message.objects.filter(
+            organization=self.organization,
+            id__gt=self.id, 
+            date_sent__isnull=False).order_by('date_sent')
+        if messages:
+            return messages[0]
+        return None
+
     def send(self, request=None):
         kwargs = {
             'msg_id': self.id,
@@ -161,6 +173,8 @@ class Message(models.Model):
         #     kwargs['user_profile'] = request.user.userprofile
         send_messages.delay(**kwargs)
         # self.log_message(contact, request, error)
+        self.date_sent = datetime.datetime.now()
+        self.save()
         return True
 
     def get_kwargs(self, phone, voice_uri):

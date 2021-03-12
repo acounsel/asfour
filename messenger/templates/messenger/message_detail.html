@@ -1,22 +1,120 @@
 {% extends 'base.html' %}
 {% block body %}
 <h1>{{ message.get_method_display }} Message</h1>
-<div class="card p-4">
-  <p><a href="{% url 'message-update' pk=message.id %}">Edit</a></p>
-  <h2>{{ message.body }}</h2>
+<div class="card p-4 MessageDetail">
+  <h2 class="h3">{{ message.body }}</h2>
   {% if message.attachment %}
   <img src="{{ message.attachment.url }}" class="w-25">
   {% endif %}
   {% if message.recording %}
   <p><a href="{{ message.recording.url }}">Sound File</a></p>
   {% endif %}
-  <h3>Sending To:</h3>
-  {% for contact in message.contacts.all %}
-  <p>{{ contact.first_name }} {{ contact.last_name }}: {{ contact.phone }}</p>
-  {% endfor %}
-  <a class="btn btn-primary d-xl-inline-block w-25" href="{% url 'message-send' pk=message.id %}">SEND</a>
-  <div class="mt-5">
-  {% include 'addins/notes.html' %}
+  <nav id="id_messageNav" class="navbar navbar-expand-lg navbar-light">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarMessage" aria-controls="navbarMessage" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarMessage">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active btn btn-outline-primary mr-1" target="#id_messageSend">
+          <a class="text-primary">Send</a>
+        </li>
+        <li class="nav-item btn btn-outline-danger mr-1" target="#id_messageEdit">
+          <a class="text-danger">Edit</a>
+        </li>
+        <li class="nav-item btn btn-outline-info mr-1" target="#id_messageRecipients">
+          <a class="text-info">Recipients</a>
+        </li>
+        <li class="nav-item btn btn-outline-success mr-1" target="#id_messageResponses">
+          <a class="text-success">Responses</a>
+        </li>
+        <li class="nav-item btn btn-outline-secondary mr-1" target="#id_messageNotes">
+          <a class="text-secondary">Notes</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <div class="card p-3 MessageCards" style="margin: 0 1rem;">
+    <div id="id_messageSend" class="collapse show">
+      <p><strong>Status: {% if message.date_sent %}Sent{% else %}Unsent{% endif %}</strong></p>
+      <p>Date Created: {{ message.date_created }}</p>
+      {% if message.date_sent %}
+      <p>Date Sent: {{ message.date_sent }}</p>
+      {% endif %}
+      <p>Recipients: {{ message.contacts.count }}</p>
+      <p>Delivered to: {{ message.messagelog_set.count }} </p>
+      <a class="btn btn-primary d-xl-inline-block w-25" href="{% url 'message-send' pk=message.id %}">{% if message.date_sent %}RE{% endif %}SEND</a>
+    </div>
+    <div id="id_messageEdit" class="collapse">
+      {% include 'addins/form.html' %}
+    </div>
+    <div id="id_messageRecipients" class="collapse">
+      <h3>Sending To:</h3>
+      <table class="table table-hover" data-sorting="true">
+        <thead>
+          <tr>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Phone Number</th>
+            <th scope="col">Tags</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for contact in contacts %}
+          <tr>
+            <th scope="row"><a href="{{ contact.url }}" class="text-dark d-block">{{ contact.first_name }}</a></th>
+            <td><a href="{{ contact.url }}" class="text-dark d-block">{{ contact.last_name }}</a></td>
+            <td><a href="{{ contact.url }}" class="text-dark d-block">{{ contact.phone }}</a></td>
+            <td><a href="{{ contact.url }}" class="text-dark d-block">{{ contact.tags }}</a></td>
+            <td><a href="{{ contact.url }}" class="text-dark d-block">{{ contact.status }}</a></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div id="id_messageResponses" class="collapse">
+      <h3>Responses</h3>
+      {% if message.method == 'sms' %}
+      <p><em>Note: There's no way to determine which inbound text messages are "responses" to an outbound message.</em></p><p><em>The list below includes all inbound texts received since this message was sent ({{ message.date_sent }}), up to the point that a outbound message was sent ({% if message.next %}{{ message.next.date_sent }}{% else %}no new message yet{% endif %}).</em></p>
+      {% endif %}
+      <table class="table table-hover" data-sorting="true">
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Phone Number</th>
+            <th scope="col">Response</th>
+            <th scope="col">Timestamp</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for response in responses %}
+          <tr>
+            <th scope="row"><a href="{{ contact.url }}" class="text-dark d-block">{{ response.contact.first_name }} {{ response.contact.last_name }}</a></th>
+            <td><a href="{{ contact.url }}" class="text-dark d-block">{{ response.contact.phone }}</a></td>
+            <td><a href="{{ contact.url }}" class="text-dark d-block">{{ response.body }}</a></td>
+            <td><a href="{{ contact.url }}" class="text-dark d-block">{{ response.date_received }}</a></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div id="id_messageNotes" class="collapse">
+      <div class="mt-5">
+        {% include 'addins/notes.html' %}
+      </div>
+    </div>
   </div>
 </div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+  $('#navbarMessage .nav-item').click( function(e) {
+    $('.MessageCards .collapse').hide();
+    var obj_id = $( this ).attr('target');
+    $( obj_id ).slideDown();
+    $('#navbarMessage .nav-item').removeClass('active');
+    $( this ).addClass('active');
+  });
+</script>
 {% endblock %}

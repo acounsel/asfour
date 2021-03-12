@@ -30,6 +30,7 @@ class UserProfileAdmin(admin.ModelAdmin):
 @admin.register(Contact)
 class ContactAdmin(admin.ModelAdmin):
     list_display = ( 
+        'id',
         'first_name', 
         'last_name', 
         'organization', 
@@ -38,6 +39,7 @@ class ContactAdmin(admin.ModelAdmin):
         'preferred_method',
     )
     list_display_links = (
+        'id',
         'first_name', 
         'last_name', 
         'organization', 
@@ -45,7 +47,7 @@ class ContactAdmin(admin.ModelAdmin):
         'email',
         'preferred_method',
     )
-    list_filter = ('organization', 'preferred_method')
+    list_filter = ('organization', 'preferred_method', 'tags')
 
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):

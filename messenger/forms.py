@@ -1,6 +1,12 @@
 from django import forms
 
-from .models import Organization
+from .models import Message, Organization
+
+class MessageForm(forms.ModelForm):
+    class Meta:
+        model = Message
+        fields = ('method', 'body', 'attachment', 'recording', 
+        'tags', 'contacts', 'request_for_response')
 
 class OrganizationForm(forms.ModelForm):
     class Meta:
@@ -12,3 +18,4 @@ class OrganizationForm(forms.ModelForm):
             'twilio_secret': forms.PasswordInput(
                 render_value=True)
         }
+

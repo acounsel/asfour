@@ -1,5 +1,6 @@
 import csv
 import io
+import re
 
 from django.apps import apps
 from django.conf import settings
@@ -20,7 +21,7 @@ from django.utils.decorators import method_decorator
 
 from celery.result import AsyncResult
 from .decorators import validate_twilio_request
-from .forms import OrganizationForm
+from .forms import OrganizationForm, MessageForm
 from .functions import send_email
 from .models import Organization, UserProfile, Contact, Tag
 from .models import Message, MessageLog, Response, Note
@@ -28,8 +29,6 @@ from .tasks import send_messages
 
 from twilio.twiml.voice_response import VoiceResponse
 from twilio.twiml.messaging_response import MessagingResponse
-from messenger import models
-from messenger import forms
 
 
 decorators = [
@@ -178,7 +177,10 @@ class ContactView(View):
         return form
 
 class ContactList(ContactView, OrgListView):
-    pass
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.prefetch_related('tags')
 
 class ContactDetail(ContactView, OrgDetailView):
     pass
@@ -233,25 +235,37 @@ class ContactImport(ContactList):
         row_errors = []
         # Index is for row numbers in error message-s.
         for index, contact in enumerate(reader, start=1):
-            contact.update({'organization': org})
             row_errors = []
             try:
-                self.import_contact_row(contact)
+                self.import_contact_row(contact, org)
             except Exception as error:
+                print(error)
                 row_errors.append('Row {0}: {1}'.format(
                     index, error))
         return row_errors
 
-    def import_contact_row(self, contact_dict):
-        contact = Contact.objects.get_or_create(
-            **contact_dict)
+    def import_contact_row(self, contact_dict, org):
+        phone = re.sub("[^0-9]", "", contact_dict['phone'])
+        if '+' not in phone:
+            phone = '+1' + phone
+        contact, created = Contact.objects.get_or_create(
+            phone=phone,
+            organization=org)
+        contact.first_name = contact_dict['first_name']
+        contact.last_name = contact_dict['last_name']
+        contact.email = contact_dict['email']
+        for tagname in ('tag1', 'tag2', 'tag3'):
+            if contact_dict.get(tagname):
+                tag, created = Tag.objects.get_or_create(
+                    name=contact_dict[tagname],
+                    organization=org)
+                contact.tags.add(tag)
+        contact.save()
         return contact
 
 class MessageView(View):
     model = Message
-    fields = ('method', 'body', 'attachment', 'recording', 
-        'tags', 'contacts', 'request_for_response')
-    success_url = reverse_lazy('message-list')
+    form_class = MessageForm
 
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)
@@ -276,7 +290,55 @@ class MessageList(MessageView, OrgListView):
     pass
 
 class MessageDetail(MessageView, OrgDetailView):
-    pass
+    
+    def get_context_data(self, **kwargs):
+        message = self.get_object()
+        context = super().get_context_data(**kwargs)
+        context['form'] = MessageForm(
+            instance=message)
+        context['form_action'] = reverse('message-update',
+            kwargs={'pk':message.id})
+        context['contacts'] = self.get_contacts(
+            message=message)
+        context['responses'] = self.get_responses(
+            message=message)
+        return context
+
+    def get_contacts(self, message):
+        contacts = message.contacts.prefetch_related(
+            'messagelog_set', 'tags')
+        contact_list = []
+        messagelogs = MessageLog.objects.filter(
+            message=message).values_list('contact', flat=True)
+        for contact in contacts:
+            if contact.id in messagelogs:
+                status = 'Sent'
+            else:
+                status = 'Unsent'
+            contact_list.append({
+                'url': contact.get_absolute_url(),
+                'first_name': contact.first_name,
+                'last_name': contact.last_name,
+                'phone': contact.phone,
+                'tags': ', '.join(
+                    tag.name for tag in contact.tags.all()),
+                'status': status,
+            })
+        return contact_list
+
+    def get_responses(self, message):
+        if message.date_sent:
+            rdict = {
+                'contact__in': message.contacts.all(),
+                'date_received__gt': message.date_sent,
+            }
+            next_msg = message.next()
+            if next_msg:
+                rdict['date_received__lte'] = next_msg.date_sent
+            responses = Response.objects.filter(
+                **rdict).select_related('contact').distinct()
+            return responses
+        return None
 
 class MessageCreate(MessageView, OrgCreateView):
     pass
@@ -285,7 +347,7 @@ class MessageUpdate(MessageView, OrgUpdateView):
     pass
 
 class MessageDelete(MessageView, OrgDeleteView):
-    pass
+    success_url = reverse_lazy('message-list')
 
 class MessageSend(MessageDetail):
 
@@ -386,7 +448,8 @@ class HarvestResponse(View):
 
     def voice_forward_and_log(self, org):
         resp = VoiceResponse()
-        resp.say('Please leave a message after the tone, then press the pound key.', 
+        resp.say('Please leave a message after the tone, \
+            then press the pound key.', 
             voice='alice')  
         resp.record()  
         resp.say('Thank you for your message. Goodbye.', 
