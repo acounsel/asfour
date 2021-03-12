@@ -287,7 +287,10 @@ class MessageView(View):
         return response
 
 class MessageList(MessageView, OrgListView):
-    pass
+   
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.prefetch_related('contacts')
 
 class MessageDetail(MessageView, OrgDetailView):
     

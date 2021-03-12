@@ -13,6 +13,7 @@
         <th scope="col">Method</th>
         <th scope="col">Attachment</th>
         <th scope="col">Contacts</th>
+        <th scope="col">Status</th>
       </tr>
     </thead>
     <tbody>
@@ -23,6 +24,7 @@
         <td>{{ message.get_method_display }}</td>
         <td>{% if message.recording %}<a href="{{ message.recording.url }}">Recording</a>{% else %}{{ message.attachment }}{% endif %}</td>
         <td>{{ message.contacts.count }}</td>
+        <td>{% if message.date_sent %}Sent{% else %}Unsent{% endif %}</td>
       </tr>
       {% endfor %}
     </tbody>

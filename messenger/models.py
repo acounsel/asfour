@@ -143,6 +143,9 @@ class Message(models.Model):
     date_created = models.DateField(auto_now_add=True)
     date_sent = models.DateTimeField(blank=True, null=True)
 
+    class Meta:
+        ordering = ('-date_created',)
+
     def __str__(self):
         return self.body
 
