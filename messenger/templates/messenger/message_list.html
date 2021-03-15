@@ -22,7 +22,7 @@
         <th scope="row">{{ message.date_created }}</th>
         <td><a href="{{ message.get_absolute_url }}">{{ message.body }}</a></td>
         <td>{{ message.get_method_display }}</td>
-        <td>{% if message.recording %}<a href="{{ message.recording.url }}">Recording</a>{% else %}{{ message.attachment }}{% endif %}</td>
+        <td>{% if message.recording %}<a href="{{ message.recording.url }}">Recording</a>{% elif message.attachment %}<a href="{{ message.get_absolute_url }}">Image</a>{% endif %}</td>
         <td>{{ message.contacts.count }}</td>
         <td>{% if message.date_sent %}Sent{% else %}Unsent{% endif %}</td>
       </tr>

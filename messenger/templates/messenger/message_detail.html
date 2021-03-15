@@ -74,6 +74,7 @@
     </div>
     <div id="id_messageResponses" class="collapse">
       <h3>Responses</h3>
+      <p><a href="{% url 'response-export' %}?msg_id={{ message.id }}">Click here to export responses</a></p>
       {% if message.method == 'sms' %}
       <p><em>Note: There's no way to determine which inbound text messages are "responses" to an outbound message.</em></p><p><em>The list below includes all inbound texts received since this message was sent ({{ message.date_sent }}), up to the point that a outbound message was sent ({% if message.next %}{{ message.next.date_sent }}{% else %}no new message yet{% endif %}).</em></p>
       {% endif %}

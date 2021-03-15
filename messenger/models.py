@@ -284,6 +284,15 @@ class Response(models.Model):
         self.contact = contact
         self.save()
 
+    def get_most_recent_message(self):
+        messages = Message.objects.filter(
+            organization=self.organization,
+            date_sent__lte=self.date_received).order_by(
+            '-date_sent')
+        if messages:
+            return messages[0]
+        return None
+
     def forward_sms(self):
         result = False
         if self.organization.forward_phone:

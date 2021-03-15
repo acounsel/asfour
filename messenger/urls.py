@@ -42,6 +42,7 @@ urlpatterns = [
     path('response/<medium>/<int:pk>/', views.HarvestResponse.as_view(), name='harvest-response'),
     path('responses/', include([
         path('', views.ResponseList.as_view(), name='response-list'),
+        path('export/', views.ResponseExport.as_view(), name='response-export'),
     ])),
     path('organization/', views.OrganizationUpdate.as_view(), name='organization-update'),
     path('user/', views.UserUpdate.as_view(), name='user-update'),

@@ -1,4 +1,5 @@
 import csv
+import datetime
 import io
 import re
 
@@ -9,7 +10,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.contrib.messages.views import SuccessMessageMixin
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -34,6 +35,16 @@ from twilio.twiml.messaging_response import MessagingResponse
 decorators = [
     csrf_exempt, require_POST, validate_twilio_request
 ]
+
+class Echo:
+    """An object that implements just the write method
+    of the file-like interface.
+    """
+    def write(self, value):
+        """Write the value by returning it, instead of
+        storing in a buffer.
+        """
+        return value
 
 class LoginRequiredMixin(LoginRequiredMixin):
 
@@ -370,6 +381,67 @@ class ResponseView(View):
 
 class ResponseList(ResponseView, OrgListView):
     pass
+
+class ResponseExport(ResponseList):
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.request.GET.get('msg_id'):
+            message = Message.objects.get(
+                id=self.request.GET.get('msg_id'))
+            queryset = queryset.filter(
+                date_received__gt=message.date_sent)
+            if message.next():
+                next_msg = message.next()
+                queryset = queryset.filter(
+                    date_received__lte=next_msg.date_sent)
+        return queryset
+
+    def get(self, request, **kwargs):
+        resp = super().get(request, **kwargs)
+        rows = self.get_response_list(self.get_queryset())
+        pseudo_buffer = Echo()
+        writer = csv.writer(pseudo_buffer)
+        response = StreamingHttpResponse(
+            (writer.writerow(row) for row in rows),
+            content_type="text/csv")
+        today = datetime.date.today()
+        filename = 'asfour_responses_{}'.format(today)
+        cont_disp = 'attachment;filename="{}.csv"'.format(
+            filename)
+        response['Content-Disposition'] = cont_disp
+        return response
+
+    def get_response_list(self, queryset):
+        header = ['phone', 'first_name', 'last_name', 'tags',
+        'response', 'method', 'recording', 'date_received',
+        'last_message_received']
+        rows = [header,]
+        for response in queryset:
+            print('getting row')
+            rows.append(self.get_response_row(response))
+        return rows
+
+    def get_response_row(self, response):
+        first_name, last_name, tags = None, None, None
+        if response.contact:
+            first_name = response.contact.first_name
+            last_name = response.contact.last_name
+            if response.contact.tags.count():
+                tags = '; '.join([tag.name for tag in \
+                response.contact.tags.all()]),
+        row = [
+            response.phone,
+            first_name,
+            last_name,
+            tags,
+            response.body,
+            response.get_method_display(),
+            getattr(response.recording, 'url', None),
+            response.date_received,
+            response.get_most_recent_message()
+        ]
+        return row
 
 @method_decorator(decorators, name='dispatch')
 class VoiceCall(View):
