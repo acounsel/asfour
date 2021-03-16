@@ -14,6 +14,7 @@ class PublicMediaStorage(S3Boto3Storage):
         location = settings.AWS_PUBLIC_MEDIA_LOCATION
     except:
         location = os.environ['AWS_PUBLIC_MEDIA_LOCATION']
+    default_acl = 'public-read'
     file_overwrite = False
 
 class PrivateMediaStorage(S3Boto3Storage):
