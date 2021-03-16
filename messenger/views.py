@@ -278,14 +278,19 @@ class MessageView(View):
     model = Message
     form_class = MessageForm
 
-    def get_form(self, *args, **kwargs):
-        form = super().get_form(*args, **kwargs)
-        org = self.request.user.userprofile.organization
-        form.fields['tags'].queryset = Tag.objects.filter(
-            organization=org)
-        form.fields['contacts'].queryset = Contact.objects \
-        .filter(organization=org)
-        return form
+    # def get_form(self, *args, **kwargs):
+    #     form = super().get_form(*args, **kwargs)
+    #     org = self.request.user.userprofile.organization
+    #     form.fields['tags'].queryset = Tag.objects.filter(
+    #         organization=org)
+    #     form.fields['contacts'].queryset = Contact.objects \
+    #     .filter(organization=org)
+    #     return form
+
+    def get_form_kwargs(self):
+        kwargs = super(MessageView, self).get_form_kwargs()
+        kwargs['user_profile'] = self.request.user.userprofile
+        return kwargs   
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -309,7 +314,8 @@ class MessageDetail(MessageView, OrgDetailView):
         message = self.get_object()
         context = super().get_context_data(**kwargs)
         context['form'] = MessageForm(
-            instance=message)
+            instance=message, 
+            user_profile=self.request.user.userprofile)
         context['form_action'] = reverse('message-update',
             kwargs={'pk':message.id})
         context['contacts'] = self.get_contacts(

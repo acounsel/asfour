@@ -1,12 +1,20 @@
 from django import forms
 
-from .models import Message, Organization
+from .models import Contact, Message, Organization, Tag
 
 class MessageForm(forms.ModelForm):
     class Meta:
         model = Message
         fields = ('method', 'body', 'attachment', 'recording', 
         'tags', 'contacts', 'request_for_response')
+
+    def __init__(self, *args, **kwargs):
+        user_profile = kwargs.pop('user_profile')
+        super(MessageForm, self).__init__(*args, **kwargs)
+        self.fields['tags'].queryset = Tag.objects.filter(
+            organization=user_profile.organization)
+        self.fields['contacts'].queryset = Contact.objects.filter(
+            organization=user_profile.organization)
 
 class OrganizationForm(forms.ModelForm):
     class Meta:

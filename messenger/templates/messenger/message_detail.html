@@ -76,7 +76,7 @@
       <h3>Responses</h3>
       <p><a href="{% url 'response-export' %}?msg_id={{ message.id }}">Click here to export responses</a></p>
       {% if message.method == 'sms' %}
-      <p><em>Note: There's no way to determine which inbound text messages are "responses" to an outbound message.</em></p><p><em>The list below includes all inbound texts received since this message was sent ({{ message.date_sent }}), up to the point that a outbound message was sent ({% if message.next %}{{ message.next.date_sent }}{% else %}no new message yet{% endif %}).</em></p>
+      <p><em>Note: There's no way to determine which inbound text messages are "responses" to an outbound message.</em></p><p><em>The list below includes all inbound texts received since this message was sent ({{ message.date_sent }}), up to the point that another outbound message was sent ({% if message.next %}<a href="{{ message.next.get_absolute_url }}">{{ message.next.date_sent }}</a>{% else %}no new message yet{% endif %}).</em></p>
       {% endif %}
       <table class="table table-hover" data-sorting="true">
         <thead>
