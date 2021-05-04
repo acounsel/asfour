@@ -377,7 +377,7 @@ class MessageSend(MessageDetail):
         message = self.get_object()
         message.send(request)
         messages.success(request, 'Message Sent!')
-        return redirect(reverse('home'))
+        return redirect(message.get_absolute_url())
 
 class MessageLogList(OrgListView):
     model = MessageLog
