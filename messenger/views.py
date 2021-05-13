@@ -381,7 +381,7 @@ class MessageSend(MessageDetail):
 
 class MessageLogList(OrgListView):
     model = MessageLog
-    paginate_by = 50
+    paginate_by = 500
 
     def get_queryset(self):
         queryset = super().get_queryset()
