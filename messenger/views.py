@@ -381,6 +381,12 @@ class MessageSend(MessageDetail):
 
 class MessageLogList(OrgListView):
     model = MessageLog
+    paginate_by = 50
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.select_related(
+            'message', 'contact', 'sender')
 
 class ResponseView(View):
     model = Response

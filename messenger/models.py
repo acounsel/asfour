@@ -241,6 +241,9 @@ class MessageLog(models.Model):
     async_task_id = models.CharField(max_length=255, default = '')
     is_finished = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ['-date', '-id']
+
     def __str__(self):
         return '{0} sent to {1} on {2}'.format(
             self.message.body,

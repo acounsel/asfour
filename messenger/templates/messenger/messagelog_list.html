@@ -12,19 +12,39 @@
         <th scope="col">Send To</th>
         <th scope="col">Sent By</th>
         <th scope="col">Date</th>
+        <th scope="col">Status</th>
       </tr>
     </thead>
     <tbody>
       {% for message in messagelog_list %}
       <tr>
-        <th scope="row"><a href="{{ message.message.et_absolute_url }}">{{ message.message }}</a></th>
+        <th scope="row"><a href="{{ message.message.get_absolute_url }}">{{ message.message }}</a></th>
         <td>{{ message.contact }}</td>
         <td>{{ message.sender }}</td>
         <td>{{ message.date }}</td>
+        <td>{{ message.get_status_display }}{% if message.error %}: {{ message.error }}{% endif %}</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
 </div>
-
+<nav class="mt-5 mx-auto" aria-label="Page navigation paginator">
+  <ul class="pagination justify-content-center">
+    <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+      <a class="page-link" href="{% if page_obj.has_previous %}?page={{ page_obj.previous_page_number }}{% endif %}" aria-label="Previous">
+        <span aria-hidden="true">&laquo;</span>
+        <span class="sr-only">Previous</span>
+      </a>
+    </li>
+    {% for i in page_obj.paginator.page_range %}
+    <li class="page-item {% if forloop.counter == page_obj.number %}active{% endif %}"><a class="page-link" href="?page={{ forloop.counter }}">{{ forloop.counter }}</a></li>
+    {% endfor %}
+    <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+      <a class="page-link" href="{% if page_obj.has_next %}?page={{ page_obj.next_page_number }}{% endif %}" aria-label="Next">
+        <span aria-hidden="true">&raquo;</span>
+        <span class="sr-only">Next</span>
+      </a>
+    </li>
+  </ul>
+</nav>
 {% endblock %}
