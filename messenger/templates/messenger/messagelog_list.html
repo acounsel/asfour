@@ -10,7 +10,7 @@
       <tr>
         <th scope="col">Message</th>
         <th scope="col">Send To</th>
-        <th scope="col">Sent By</th>
+<!--         <th scope="col">Sent By</th> -->
         <th scope="col">Date</th>
         <th scope="col">Status</th>
       </tr>
@@ -20,7 +20,7 @@
       <tr>
         <th scope="row"><a href="{{ message.message.get_absolute_url }}">{{ message.message }}</a></th>
         <td>{{ message.contact }}</td>
-        <td>{{ message.sender }}</td>
+<!--         <td>{{ message.sender }}</td> -->
         <td>{{ message.date }}</td>
         <td>{{ message.get_status_display }}{% if message.error %}: {{ message.error }}{% endif %}</td>
       </tr>
