@@ -170,10 +170,10 @@ class Message(models.Model):
         kwargs = {
             'msg_id': self.id,
         }
-        if request:
-            if hasattr(request.user, 'userprofile'):
-                kwargs['user_profile'] = \
-                request.user.userprofile
+        # if request:
+        #     if hasattr(request.user, 'userprofile'):
+        #         kwargs['user_profile'] = \
+        #         request.user.userprofile
         if self.method == 'voice':
             kwargs['voice_uri'] = self.get_voice_uri(request)
         # if request:
