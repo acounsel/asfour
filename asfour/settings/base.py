@@ -120,7 +120,7 @@ EMAIL_USE_TLS = True
 RECAPTCHA_API_KEY = get_env_variable('RECAPTCHA_API_KEY')
 RECAPTCHA_SECRET_KEY = get_env_variable('RECAPTCHA_SECRET_KEY')
 SERVER_EMAIL = 'noreply@3asfour.com'
-
+DEFAULT_FROM_EMAIL = 'admin@3asfour.com'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators

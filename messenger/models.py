@@ -8,6 +8,7 @@ from asfour.storage_backends import PrivateMediaStorage
 from asfour.storage_backends import PublicMediaStorage
 from twilio.rest import Client
 
+from .functions import send_email
 from .tasks import task_send_email, send_messages
 
 class Organization(models.Model):
