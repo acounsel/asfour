@@ -4,8 +4,8 @@
   <h1>Contact List</h1>
   <h2><a href=""><i class="fas fa-download pr-4"></i></a></h2>
 </div>
-<div class="card mt-5">
-  <table class="table table-responsive" data-sorting="true">
+<div class="card mt-5 table-responsive">
+  <table class="table" data-sorting="true">
     <thead>
       <tr>
         <th scope="col">Name</th>
@@ -20,7 +20,7 @@
     <tbody>
       {% for contact in contact_list %}
       <tr>
-        <th scope="row"><a href="{{ contact.get_absolute_url }}">{{ contact.first_name }} {{ contact.last_name }}</a></th>
+        <th scope="row"><a href="{{ contact.get_absolute_url }}">{% if contact.first_name or contact.last_name %}{{ contact.first_name }} {{ contact.last_name }}{% else %}No Name Provided{% endif %}</a></th>
         <td><a href="{{ contact.get_absolute_url }}">{{ contact.phone }}</a></td>
         <td><a href="{{ contact.get_absolute_url }}">{{ contact.email }}</a></td>
         <td><a href="{{ contact.get_absolute_url }}">{{ contact.tags.all|join:", " }}</a></td>

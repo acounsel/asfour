@@ -304,7 +304,8 @@ class MessageView(View):
         response = super().form_valid(form)
         contacts = Contact.objects.filter(
             tags__in=self.object.tags.all()).distinct()
-        self.object.contacts.set(contacts)
+        for contact in contacts:
+            self.object.contacts.add(contacts)
         if self.request.POST.get('add_all'):
             org = self.request.user.userprofile.organization
             contacts = org.contact_set.all()
