@@ -18,8 +18,8 @@
 <div class="w-100 bg-dark pb-5">
   <div class="w-75 mx-auto py-5">
     <h3 style="font-family:'Montserrat';font-size:2.5rem;font-weight:200;" class="pb-5 text-white text-center">Manage Your Messages</h3>
-    <div class="d-flex justify-content-between">
-      <div class="w-25">
+    <div class="d-flex flex-column flex-lg-row justify-content-between">
+      <div class="mb-4">
         <div style="border-radius:.75rem;" class="card">
           <div class="card-body">
             <div class="d-flex align-items-center">
@@ -37,7 +37,7 @@
           </div>
         </div>
       </div>
-      <div class="w-25">
+      <div class="mb-4">
         <div style="border-radius:.75rem;" class="card">
           <div class="card-body">
             <div class="d-flex align-items-center">
@@ -55,7 +55,7 @@
           </div>
         </div>
       </div>
-      <div class="w-25">
+      <div class="mb-4">
         <div style="border-radius:.75rem;" class="card">
           <div class="card-body">
             <div class="d-flex align-items-center">
@@ -78,7 +78,7 @@
 </div>
 <div class="py-5 bg-light w-100">
   <h3 style="font-family:'Montserrat';font-size:2.5rem;font-weight:200;" class="pb-5 text-dark text-center">Sign Up To Request Access</h3>
-  <form style="max-width:500px;" class="w-50 mx-auto" method="POST">
+  <form style="max-width:500px;" class="px-3 mx-auto" method="POST">
     {% csrf_token %}
     <input type="text" name="name" placeholder="Name" class="form-control mb-4">
     <input type="email" name="email" placeholder="Email" class="form-control mb-4">

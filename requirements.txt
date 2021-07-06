@@ -2,7 +2,7 @@ Boto3
 redis
 celery==4.4.7
 django
-django_celery_beat
+django-celery-beat
 django_celery_results
 django-debug-toolbar
 django_redis_cache
@@ -12,5 +12,6 @@ django-heroku
 django-import-export
 django-storages
 gunicorn
+ipython
 sendgrid
 twilio

@@ -85,6 +85,7 @@ class Contact(models.Model):
     tags = models.ManyToManyField(Tag, blank=True)
     has_consented = models.BooleanField(default=False)
     has_whatsapp = models.BooleanField(default=False)
+    is_unsubscribed = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('first_name',)
@@ -94,9 +95,18 @@ class Contact(models.Model):
             self.first_name, self.last_name)
 
     def save(self, *args, **kwargs):
+        tag = None
+        if not self.id:
+            tag, created = Tag.objects.get_or_create(
+                name='All Contacts',
+                organization=self.organization
+            )
         if '+' not in self.phone:
             self.phone = '+1' + self.phone
         super(Contact, self).save(*args, **kwargs)
+        if tag:
+            self.tags.add(tag)
+            super(Contact, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('contact-detail', 
@@ -145,7 +155,7 @@ class Message(models.Model):
     date_sent = models.DateTimeField(blank=True, null=True)
 
     class Meta:
-        ordering = ('-date_created',)
+        ordering = ('-date_sent', '-date_created')
 
     def __str__(self):
         return self.body
@@ -177,8 +187,6 @@ class Message(models.Model):
         #         request.user.userprofile
         if self.method == 'voice':
             kwargs['voice_uri'] = self.get_voice_uri(request)
-        # if request:
-        #     kwargs['user_profile'] = request.user.userprofile
         send_messages.delay(**kwargs)
         # self.log_message(contact, request, error)
         self.date_sent = datetime.datetime.now()
@@ -224,6 +232,15 @@ class Message(models.Model):
         log.save()
         return log
 
+    def get_segments(self):
+        chars = len(self.body)
+        return -(-chars // 160)
+
+    def get_delivery_window(self):
+        segs = self.get_segments()
+        contacts = self.contacts.count()
+        return round(segs * contacts / 180)
+
 class MessageLog(models.Model):
     SUCCESS = 'success'
     FAILED = 'failed'
@@ -235,6 +252,8 @@ class MessageLog(models.Model):
         on_delete=models.CASCADE)
     status = models.CharField(max_length=40, 
         choices=STATUS_CHOICES, default=SUCCESS)
+    twilio_status = models.CharField(max_length=200, 
+        blank=True)
     organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE)
     contact = models.ForeignKey(Contact, 
@@ -243,7 +262,8 @@ class MessageLog(models.Model):
     sender = models.ForeignKey(UserProfile,
         on_delete=models.SET_NULL, blank=True, null=True)
     error = models.TextField(blank=True)
-    async_task_id = models.CharField(max_length=255, default = '')
+    async_task_id = models.CharField(max_length=255, 
+        default = '')
     is_finished = models.BooleanField(default=False)
 
     class Meta:
@@ -255,6 +275,18 @@ class MessageLog(models.Model):
             self.contact.get_full_name(),
             self.date
         )
+
+class Autoreply(models.Model):
+
+    organization = models.ForeignKey(Organization, 
+        on_delete=models.CASCADE)
+    text = models.CharField(max_length=255)
+    reply = models.CharField(max_length=255)
+    tags = models.ManyToManyField(Tag, blank=True)
+    prev_msg = models.ManyToManyField(Message, blank=True)
+
+    def __str__(self):
+        return self.reply
 
 class Response(models.Model):
     SMS = 'sms'

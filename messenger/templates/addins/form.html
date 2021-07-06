@@ -1,8 +1,13 @@
 {% load crispy_forms_tags %}
-<form class="mt-5 w-50" method="POST" novalidate enctype="multipart/form-data" action="{{ form_action }}">
+<form class="mt-5 w-50 w-100-r" method="POST" novalidate enctype="multipart/form-data" action="{{ form_action }}">
   {% csrf_token %}
   {{ form|crispy }}
   {{ form.errors  }}
+  {% if add_all_bool %}
+  <div class="mb-4">
+    <input type="checkbox" value="add_all" name="add_all" class="mr-2">Add all contacts
+  </div>
+  {% endif %}
   <input type="submit" value="Save" class="btn btn-primary px-4">
   {% if form.instance %}
   <a href="{{ form.instance.get_delete_url }}" class="btn btn-danger px-4 ml-5">Delete</a>

@@ -78,6 +78,27 @@
           border-radius: 0.3rem 0.3rem 0 0;
           width: 7rem;
         }
+        @media only screen and (max-width: 900px) {
+          .w-90-r {
+            width: 90% !important;
+          }
+          .w-100-r {
+            width: 90% !important;
+          }
+          .p-1-r {
+            padding: .25rem!important;
+          }
+          .mt-2-r {
+            margin-top: 0.5rem!important;
+          }
+          #id_messageNav .nav-item {
+            border-radius: .25rem;
+            width: 100%;
+          }
+          .MessageCards {
+            margin-top: 1rem!important;
+          }
+        }
     </style>
   </head>
   <body>
@@ -93,7 +114,7 @@
     </header>
     <main class="bg-light" style="min-height: 700px;">
       {% block main %}
-        <div class="py-5 w-75 w-100-r mx-auto mb-5">
+        <div class="py-5 w-75 w-90-r mx-auto mb-5">
         {% block body %}
         {% endblock %}
         </div>

@@ -19,7 +19,8 @@ def task_send_email(to, subject, content):
     return 'done'
 
 @app.task
-def message_log(MessageLog, message, contact, user_profile, error):
+def message_log(MessageLog, message, contact, user_profile, 
+    sid, error):
     log = MessageLog.objects.create(
             message=message,
             organization=message.organization,
@@ -48,9 +49,12 @@ def send_messages(msg_id, voice_uri=None, user_profile=None):
     for contact in message.contacts.all():
         try:
             kwargs['to'] = contact.phone
-            client_action.create(**kwargs)
+            msg = client_action.create(**kwargs)
+            sid = getattr(msg, 'sid', None)
             error = None
         except Exception as e:
+            sid = None
             error = e
-        log = message_log(MessageLog, message, contact, user_profile, error)
+        log = message_log(MessageLog, message, contact, 
+            user_profile, sid, error)
         log.save()

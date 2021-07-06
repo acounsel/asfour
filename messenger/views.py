@@ -179,6 +179,7 @@ class ContactView(View):
     fields = ('first_name', 'last_name', 'phone', 'email',
         'preferred_method', 'tags', 'has_whatsapp')
     success_url = reverse_lazy('contact-list')
+    paginate_by = 500
 
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)
@@ -191,7 +192,8 @@ class ContactList(ContactView, OrgListView):
     
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.prefetch_related('tags')
+        return queryset.prefetch_related('tags', 
+            'response_set', 'messagelog_set')
 
 class ContactDetail(ContactView, OrgDetailView):
     pass
@@ -287,18 +289,29 @@ class MessageView(View):
     #     .filter(organization=org)
     #     return form
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['add_all_bool'] = True
+        return context
+
     def get_form_kwargs(self):
         kwargs = super(MessageView, self).get_form_kwargs()
         kwargs['user_profile'] = self.request.user.userprofile
         return kwargs   
 
     def form_valid(self, form):
+        print(self.request.POST)
         response = super().form_valid(form)
         contacts = Contact.objects.filter(
             tags__in=self.object.tags.all()).distinct()
-        for contact in contacts:
-            if contact not in self.object.contacts.all():
-                self.object.contacts.add(contact)
+        self.object.contacts.set(contacts)
+        if self.request.POST.get('add_all'):
+            org = self.request.user.userprofile.organization
+            contacts = org.contact_set.all()
+            self.object.contacts.set(contacts)
+        # for contact in contacts:
+        #     if contact not in self.object.contacts.all():
+        #         self.object.contacts.add(contact)
         self.object.save()
         return response
 
@@ -392,7 +405,11 @@ class ResponseView(View):
     model = Response
 
 class ResponseList(ResponseView, OrgListView):
-    pass
+    paginate_by = 500
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.select_related('contact')
 
 class ResponseExport(ResponseList):
 

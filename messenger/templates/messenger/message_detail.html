@@ -15,19 +15,19 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarMessage">
       <ul class="navbar-nav mr-auto">
-        <li class="nav-item active btn btn-outline-primary mr-1" target="#id_messageSend">
+        <li class="nav-item active btn btn-outline-primary mr-1 mt-2-r" target="#id_messageSend">
           <a class="text-primary">Send</a>
         </li>
-        <li class="nav-item btn btn-outline-danger mr-1" target="#id_messageEdit">
+        <li class="nav-item btn btn-outline-danger mr-1 mt-2-r" target="#id_messageEdit">
           <a class="text-danger">Edit</a>
         </li>
-        <li class="nav-item btn btn-outline-info mr-1" target="#id_messageRecipients">
+        <li class="nav-item btn btn-outline-info mr-1 mt-2-r" target="#id_messageRecipients">
           <a class="text-info">Recipients</a>
         </li>
-        <li class="nav-item btn btn-outline-success mr-1" target="#id_messageResponses">
+        <li class="nav-item btn btn-outline-success mr-1 mt-2-r" target="#id_messageResponses">
           <a class="text-success">Responses</a>
         </li>
-        <li class="nav-item btn btn-outline-secondary mr-1" target="#id_messageNotes">
+        <li class="nav-item btn btn-outline-secondary mr-1 mt-2-r" target="#id_messageNotes">
           <a class="text-secondary">Notes</a>
         </li>
       </ul>
@@ -41,15 +41,17 @@
       <p>Date Sent: {{ message.date_sent }}</p>
       {% endif %}
       <p>Recipients: {{ message.contacts.count }}</p>
+      <p>Character count: {{ message.body|length }} ({{ message.get_segments }} segments)</p>
+      <p>Estimated delivery window: {{ message.get_delivery_window }} minutes</p>
       <p>Delivered to: {{ message.messagelog_set.count }} </p>
-      <a class="btn btn-primary d-xl-inline-block w-25" href="{% url 'message-send' pk=message.id %}">{% if message.date_sent %}RE{% endif %}SEND</a>
+      <a class="btn btn-primary d-xl-inline-block px-5" href="{% url 'message-send' pk=message.id %}">{% if message.date_sent %}RE{% endif %}SEND</a>
     </div>
     <div id="id_messageEdit" class="collapse">
       {% include 'addins/form.html' %}
     </div>
     <div id="id_messageRecipients" class="collapse">
       <h3>Sending To:</h3>
-      <table class="table table-hover" data-sorting="true">
+      <table class="table table-responsive table-hover" data-sorting="true">
         <thead>
           <tr>
             <th scope="col">First Name</th>
@@ -78,7 +80,7 @@
       {% if message.method == 'sms' %}
       <p><em>Note: There's no way to determine which inbound text messages are "responses" to an outbound message.</em></p><p><em>The list below includes all inbound texts received since this message was sent ({{ message.date_sent }}), up to the point that another outbound message was sent ({% if message.next %}<a href="{{ message.next.get_absolute_url }}">{{ message.next.date_sent }}</a>{% else %}no new message yet{% endif %}).</em></p>
       {% endif %}
-      <table class="table table-hover" data-sorting="true">
+      <table class="table table-responsive table-hover" data-sorting="true">
         <thead>
           <tr>
             <th scope="col">Name</th>
