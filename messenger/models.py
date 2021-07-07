@@ -178,15 +178,7 @@ class Message(models.Model):
         return None
 
     def send(self, request=None):
-        kwargs = {
-            'msg_id': self.id,
-            'status_callback': '{}{}'.format(
-                'https://www.asfour.com',
-                reverse('status-callback', kwargs={
-                    'pk':self.organization.id
-                }),
-            )
-        }
+        kwargs = {'msg_id': self.id,}
         # if request:
         #     if hasattr(request.user, 'userprofile'):
         #         kwargs['user_profile'] = \
@@ -200,7 +192,15 @@ class Message(models.Model):
         return True
 
     def get_kwargs(self, phone, voice_uri):
-        kwargs = {'from_':phone,}
+        kwargs = {
+            'from_':phone,
+            'status_callback': '{}{}'.format(
+                'https://www.asfour.com',
+                reverse('status-callback', kwargs={
+                    'pk':self.organization.id
+                }),
+            )
+        }
         if voice_uri:
             kwargs['url'] = voice_uri
         else:
