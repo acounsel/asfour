@@ -54,7 +54,7 @@ def send_messages(msg_id, voice_uri=None, user_profile=None):
             kwargs['to'] = contact.phone
             msg = client_action.create(**kwargs)
             sid = getattr(msg, 'sid', None)
-            error = None
+            error = ""
         except Exception as e:
             sid = None
             error = e
