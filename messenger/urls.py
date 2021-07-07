@@ -39,6 +39,7 @@ urlpatterns = [
             path('<pk>/voice-call/<msg_id>', views.VoiceCall.as_view(), name='voice-call'),
         ])),
     ])),
+    path('status-callback/<int:pk>', views.StatusCallback.as_view(), name='status-callback'),
     path('response/<medium>/<int:pk>/', views.HarvestResponse.as_view(), name='harvest-response'),
     path('responses/', include([
         path('', views.ResponseList.as_view(), name='response-list'),

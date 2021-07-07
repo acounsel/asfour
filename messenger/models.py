@@ -180,6 +180,11 @@ class Message(models.Model):
     def send(self, request=None):
         kwargs = {
             'msg_id': self.id,
+            'status_callback': '{}{}{}'.format(
+                'https://www.asfour.com',
+                reverse('status-callback'),
+                self.organization.id,
+            )
         }
         # if request:
         #     if hasattr(request.user, 'userprofile'):
@@ -248,6 +253,7 @@ class MessageLog(models.Model):
         (SUCCESS, 'Success'),
         (FAILED, 'Failed'),
     )
+    sid = models.CharField(max_length=255, blank=True)
     message = models.ForeignKey(Message, 
         on_delete=models.CASCADE)
     status = models.CharField(max_length=40, 

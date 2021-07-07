@@ -22,9 +22,12 @@ def task_send_email(to, subject, content):
 def message_log(MessageLog, message, contact, user_profile, 
     sid, error):
     log = MessageLog.objects.create(
-            message=message,
-            organization=message.organization,
-            contact=contact)
+        message=message,
+        organization=message.organization,
+        contact=contact,
+        sid=sid,
+        error=error
+    )
     if user_profile:
         log.sender = user_profile
     if error:

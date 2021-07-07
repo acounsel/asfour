@@ -502,6 +502,34 @@ class VoiceCall(View):
         )
 
 @method_decorator(decorators, name='dispatch')
+class StatusCallback(View):
+    
+    def post(self, request, **kwargs):
+        resp = 200
+        org = Organization.objects.get(
+            id=self.kwargs.get('pk'))
+        try:
+            callback = self.get_callback_dict(request)
+            log = MessageLog.objects.filter(
+                sid=callback['MessageSid'],
+                to=callback['To']
+            )
+            if log:
+                log[0].twilio_status = callback['MessageStatus']
+                log[0].save()
+        except:
+            resp = 400
+        print(request.POST)
+        print(self.kwargs)
+        return HttpResponse(resp)
+
+    def get_callback_dict(self, request):
+        callback_dict = {}
+        for key in ('From','MessageSid','MessageStatus','To'):
+            callback_dict[key] = request.POST.get(key)
+        return callback_dict
+
+@method_decorator(decorators, name='dispatch')
 class HarvestResponse(View):
 
     def post(self, request, **kwargs):
