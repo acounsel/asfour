@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="d-flex justify-content-between">
+  <h1>Manage Autoreplies</h1>
+  <h2><a href=""><i class="fas fa-download pr-4"></i></a></h2>
+</div>
+<div class="card mt-5 table-responsive">
+  <table class="table" data-sorting="true">
+    <thead>
+      <tr>
+        <th scope="col">If Someone Sends</th>
+        <th scope="col">Respond With</th>
+        <th scope="col">Add Tags</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for reply in autoreply_list %}
+      <tr>
+        <th scope="row"><a href="{{ autoreply.get_absolute_url }}">{{ reply.text }}</a></th>
+        <td><a href="{{ autoreply.get_absolute_url }}">{{ reply.reply }}</a></td>
+        <td><a href="{{ autoreply.get_absolute_url }}">{{ reply.tags.all|join:", " }}</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

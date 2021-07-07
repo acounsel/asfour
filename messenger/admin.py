@@ -2,8 +2,8 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
 
-from .models import Organization, UserProfile, Contact
-from .models import Message, MessageLog, Response, Note
+from .models import (Autoreply, Contact, Message, MessageLog, 
+    Note, Organization, Response, Tag, UserProfile)
 
 admin.site.register(Organization)
 
@@ -66,6 +66,12 @@ class ResponseAdmin(admin.ModelAdmin):
     list_display = ('body', 'contact', 'organization')
     list_display_links = ('body', 'contact', 'organization')
     list_filter = ('body', 'contact', 'organization')
+
+@admin.register(Autoreply)
+class AutoreplyAdmin(admin.ModelAdmin):
+    list_display = ('organization', 'text', 'reply')
+    list_display_links = ('organization', 'text', 'reply')
+    list_filter = ('organization',)
 
 @admin.register(Note)
 class NoteAdmin(admin.ModelAdmin):

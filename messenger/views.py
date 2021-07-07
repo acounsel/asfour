@@ -24,8 +24,8 @@ from celery.result import AsyncResult
 from .decorators import validate_twilio_request
 from .forms import OrganizationForm, MessageForm
 from .functions import send_email
-from .models import Organization, UserProfile, Contact, Tag
-from .models import Message, MessageLog, Response, Note
+from .models import (Autoreply, Contact, Message, MessageLog, 
+    Note, Organization, Response, Tag, UserProfile)
 from .tasks import send_messages
 
 from twilio.twiml.voice_response import VoiceResponse
@@ -473,6 +473,18 @@ class ResponseExport(ResponseList):
         ]
         return row
 
+class AutoreplyView(View):
+    model = Autoreply
+
+class AutoreplyCreate(AutoreplyView, OrgCreateView):
+    pass
+
+class AutoreplyUpdate(AutoreplyView, OrgUpdateView):
+    pass
+
+class AutoreplyList(AutoreplyView, OrgListView):
+    pass
+
 @method_decorator(decorators, name='dispatch')
 class VoiceCall(View):
     model = Message
@@ -505,6 +517,7 @@ class VoiceCall(View):
 class StatusCallback(View):
     
     def post(self, request, **kwargs):
+        print('STATUS CALLBACK TRIGGERED')
         resp = 200
         org = Organization.objects.get(
             id=self.kwargs.get('pk'))
@@ -512,12 +525,13 @@ class StatusCallback(View):
             callback = self.get_callback_dict(request)
             log = MessageLog.objects.filter(
                 sid=callback['MessageSid'],
-                to=callback['To']
+                contact__phone=callback['To']
             )
             if log:
                 log[0].twilio_status = callback['MessageStatus']
                 log[0].save()
         except:
+            print('STATUS UPDATE FAILED')
             resp = 400
         print(request.POST)
         print(self.kwargs)
@@ -541,7 +555,6 @@ class HarvestResponse(View):
         if save:
             response = Response.objects.create(**resp_kwargs)
             response.add_contact()
-
             if self.kwargs.get('medium') == 'message':
                 resp = self.sms_forward_and_respond(
                     org, response)
@@ -576,7 +589,7 @@ class HarvestResponse(View):
     def sms_forward_and_respond(self, org, response):
         response.forward_sms()
         resp = MessagingResponse()
-        resp.message(org.response_msg)
+        resp.message(org.get_response_msg(response.body))
         return str(resp)
 
     def voice_forward_and_log(self, org):

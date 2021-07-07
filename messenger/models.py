@@ -34,6 +34,12 @@ class Organization(models.Model):
         return self.twilio_api_key, \
             self.twilio_secret, self.phone
 
+    def get_response_msg(self, text):
+        for reply in org.autoreply_set.all():
+            if text == reply.text:
+                return reply.reply
+        return self.response_msg
+
 class UserProfile(models.Model):
 
     user = models.OneToOneField(User, 
@@ -291,6 +297,9 @@ class Autoreply(models.Model):
     reply = models.CharField(max_length=255)
     tags = models.ManyToManyField(Tag, blank=True)
     prev_msg = models.ManyToManyField(Message, blank=True)
+
+    class Meta:
+        verbose_name_plural = 'autoreplies'
 
     def __str__(self):
         return self.reply
