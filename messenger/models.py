@@ -180,10 +180,11 @@ class Message(models.Model):
     def send(self, request=None):
         kwargs = {
             'msg_id': self.id,
-            'status_callback': '{}{}{}'.format(
+            'status_callback': '{}{}'.format(
                 'https://www.asfour.com',
-                reverse('status-callback'),
-                self.organization.id,
+                reverse('status-callback', kwargs={
+                    'pk':self.organization.id
+                }),
             )
         }
         # if request:
