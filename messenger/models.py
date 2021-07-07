@@ -35,8 +35,8 @@ class Organization(models.Model):
             self.twilio_secret, self.phone
 
     def get_response_msg(self, text):
-        for reply in org.autoreply_set.all():
-            if text == reply.text:
+        for reply in self.autoreply_set.all():
+            if text.lower() == reply.text.lower():
                 return reply.reply
         return self.response_msg
 
@@ -201,7 +201,7 @@ class Message(models.Model):
         kwargs = {
             'from_':phone,
             'status_callback': '{}{}'.format(
-                'https://www.asfour.com',
+                'https://www.3asfour.com',
                 reverse('status-callback', kwargs={
                     'pk':self.organization.id
                 }),

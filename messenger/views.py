@@ -475,6 +475,8 @@ class ResponseExport(ResponseList):
 
 class AutoreplyView(View):
     model = Autoreply
+    fields = ('text', 'reply', 'tags')
+    success_url = reverse_lazy('autoreply-list')
 
 class AutoreplyCreate(AutoreplyView, OrgCreateView):
     pass

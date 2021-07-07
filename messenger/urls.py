@@ -41,6 +41,7 @@ urlpatterns = [
     ])),
     path('autoreplies/', include([
         path('', views.AutoreplyList.as_view(), name='autoreply-list'),
+        path('add/',views.AutoreplyCreate.as_view(), name='autoreply-create'),
     ])),
     path('status-callback/<int:pk>', views.StatusCallback.as_view(), name='status-callback'),
     path('response/<medium>/<int:pk>/', views.HarvestResponse.as_view(), name='harvest-response'),
