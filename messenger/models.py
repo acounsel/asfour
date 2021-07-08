@@ -34,9 +34,10 @@ class Organization(models.Model):
         return self.twilio_api_key, \
             self.twilio_secret, self.phone
 
-    def get_response_msg(self, text):
+    def get_reply_msg(self, response):
         for reply in self.autoreply_set.all():
-            if text.lower() == reply.text.lower():
+            if response.text.lower() == reply.text.lower():
+                reply.add_tags(response.contact)
                 return reply.reply
         return self.response_msg
 
@@ -303,6 +304,16 @@ class Autoreply(models.Model):
 
     def __str__(self):
         return self.reply
+
+    def get_absolute_url(self):
+        return reverse('autoreply-update', 
+            kwargs={'pk':self.id})
+
+    def add_tags(self, contact):
+        if contact:
+            for tag in self.tags.all():
+                contact.tags.add(tag)
+            contact.save()
 
 class Response(models.Model):
     SMS = 'sms'

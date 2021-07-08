@@ -305,7 +305,7 @@ class MessageView(View):
         contacts = Contact.objects.filter(
             tags__in=self.object.tags.all()).distinct()
         for contact in contacts:
-            self.object.contacts.add(contacts)
+            self.object.contacts.add(contact)
         if self.request.POST.get('add_all'):
             org = self.request.user.userprofile.organization
             contacts = org.contact_set.all()
@@ -591,7 +591,7 @@ class HarvestResponse(View):
     def sms_forward_and_respond(self, org, response):
         response.forward_sms()
         resp = MessagingResponse()
-        resp.message(org.get_response_msg(response.body))
+        resp.message(org.get_reply_msg(response))
         return str(resp)
 
     def voice_forward_and_log(self, org):

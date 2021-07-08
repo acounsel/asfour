@@ -16,9 +16,9 @@
     <tbody>
       {% for reply in autoreply_list %}
       <tr>
-        <th scope="row"><a href="{{ autoreply.get_absolute_url }}">{{ reply.text }}</a></th>
-        <td><a href="{{ autoreply.get_absolute_url }}">{{ reply.reply }}</a></td>
-        <td><a href="{{ autoreply.get_absolute_url }}">{{ reply.tags.all|join:", " }}</a></td>
+        <th scope="row"><a href="{{ reply.get_absolute_url }}">{{ reply.text }}</a></th>
+        <td><a href="{{ reply.get_absolute_url }}">{{ reply.reply }}</a></td>
+        <td><a href="{{ reply.get_absolute_url }}">{{ reply.tags.all|join:", " }}</a></td>
       </tr>
       {% endfor %}
     </tbody>
