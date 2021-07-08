@@ -105,6 +105,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'asfour.wsgi.application'
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 CELERY_BROKER_URL = os.environ.get('REDIS_URL')
 CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL')
@@ -168,6 +169,8 @@ CACHES = {
 
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())
