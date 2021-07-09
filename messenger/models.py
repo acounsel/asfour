@@ -208,9 +208,9 @@ class Message(models.Model):
             )
         }
         if self.method == self.WHATSAPP:
-           kwargs['from_'] = phone
+           kwargs['from_'] = 'whatsapp:{}'.format(phone)
         else:
-            kwargs['from_'] = 'whatsapp:{}'.format(phone)
+            kwargs['from_'] = phone
         if voice_uri:
             kwargs['url'] = voice_uri
         else:
