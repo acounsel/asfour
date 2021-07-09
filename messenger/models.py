@@ -290,6 +290,12 @@ class MessageLog(models.Model):
             self.date
         )
 
+    def get_status(self):
+        if self.twilio_status:
+            return self.twilio_status
+        else:
+            return self.get_status_display()
+
 class Autoreply(models.Model):
 
     organization = models.ForeignKey(Organization, 

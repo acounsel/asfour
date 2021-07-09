@@ -56,7 +56,7 @@ def send_messages(msg_id, voice_uri=None, user_profile=None):
             sid = getattr(msg, 'sid', None)
             error = ""
         except Exception as e:
-            sid = None
+            sid = ""
             error = e
         log = message_log(MessageLog, message, contact, 
             user_profile, sid, error)
