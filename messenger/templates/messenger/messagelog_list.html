@@ -22,7 +22,7 @@
         <td>{{ message.contact }}</td>
 <!--         <td>{{ message.sender }}</td> -->
         <td>{{ message.date }}</td>
-        <td>{{ message.get_status_display }}{% if message.error %}: {{ message.error }}{% endif %}</td>
+        <td>{{ message.get_status }}{% if message.error %}: {{ message.error }}{% endif %}</td>
       </tr>
       {% endfor %}
     </tbody>

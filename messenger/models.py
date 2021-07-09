@@ -200,7 +200,6 @@ class Message(models.Model):
 
     def get_kwargs(self, phone, voice_uri):
         kwargs = {
-            'from_':phone,
             'status_callback': '{}{}'.format(
                 'https://www.3asfour.com',
                 reverse('status-callback', kwargs={
@@ -208,6 +207,10 @@ class Message(models.Model):
                 }),
             )
         }
+        if self.method == message.WHATSAPP:
+           kwargs['from_'] = phone
+        else:
+            kwargs['from_'] = 'whatsapp:{}'.format(phone)
         if voice_uri:
             kwargs['url'] = voice_uri
         else:
