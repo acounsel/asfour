@@ -102,18 +102,23 @@ class Contact(models.Model):
             self.first_name, self.last_name)
 
     def save(self, *args, **kwargs):
-        tag = None
-        if not self.id:
-            tag, created = Tag.objects.get_or_create(
-                name='All Contacts',
-                organization=self.organization
-            )
         if '+' not in self.phone:
             self.phone = '+1' + self.phone
         super(Contact, self).save(*args, **kwargs)
-        if tag:
-            self.tags.add(tag)
-            super(Contact, self).save(*args, **kwargs)
+
+    # def save(self, *args, **kwargs):
+    #     tag = None
+    #     if not self.id:
+    #         tag, created = Tag.objects.get_or_create(
+    #             name='All Contacts',
+    #             organization=self.organization
+    #         )
+    #     if '+' not in self.phone:
+    #         self.phone = '+1' + self.phone
+    #     super(Contact, self).save(*args, **kwargs)
+    #     if tag:
+    #         self.tags.add(tag)
+    #         super(Contact, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('contact-detail', 
