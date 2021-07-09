@@ -228,7 +228,7 @@ class Message(models.Model):
         )
 
     def get_client_verb(self):
-        if self.method == self.SMS:
+        if self.method in (self.SMS, self.WHATSAPP):
             verb = 'messages'
         else:
             verb = 'calls'
@@ -295,7 +295,7 @@ class MessageLog(models.Model):
 
     def get_status(self):
         if self.twilio_status:
-            return self.twilio_status
+            return self.twilio_status.title()
         else:
             return self.get_status_display()
 
