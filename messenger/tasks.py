@@ -51,7 +51,7 @@ def send_messages(msg_id, voice_uri=None, user_profile=None):
     kwargs = message.get_kwargs(phone, voice_uri)
     for contact in message.contacts.all():
         try:
-            kwargs['to'] = contact.phone
+            kwargs['to'] = get_recipient(message, contact)
             msg = client_action.create(**kwargs)
             sid = getattr(msg, 'sid', None)
             error = ""
@@ -61,3 +61,9 @@ def send_messages(msg_id, voice_uri=None, user_profile=None):
         log = message_log(MessageLog, message, contact, 
             user_profile, sid, error)
         log.save()
+
+def get_recipient(message, contact):
+    if message.method == message.WHATSAPP:
+        return 'whatsapp:{}'.format(contact.phone)
+    else:
+        return contact.phone
