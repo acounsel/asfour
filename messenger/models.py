@@ -207,7 +207,7 @@ class Message(models.Model):
                 }),
             )
         }
-        if self.method == message.WHATSAPP:
+        if self.method == self.WHATSAPP:
            kwargs['from_'] = phone
         else:
             kwargs['from_'] = 'whatsapp:{}'.format(phone)
