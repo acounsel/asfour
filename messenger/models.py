@@ -356,7 +356,7 @@ class Response(models.Model):
 
     def add_contact(self):
         if 'whatsapp' in self.phone:
-            self.phone = self.phone.split(':')
+            self.phone = self.phone.split(':')[1]
         contact, created = Contact.objects.get_or_create(
             phone=self.phone, organization=self.organization)
         self.contact = contact
