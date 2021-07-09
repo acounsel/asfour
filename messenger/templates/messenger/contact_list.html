@@ -24,8 +24,8 @@
         <td><a href="{{ contact.get_absolute_url }}">{{ contact.phone }}</a></td>
         <td><a href="{{ contact.get_absolute_url }}">{{ contact.email }}</a></td>
         <td><a href="{{ contact.get_absolute_url }}">{{ contact.tags.all|join:", " }}</a></td>
-        <td class="text-center"><a href="{{ contact.get_absolute_url }}">{{ contact.messagelog_set.count }}</a></td>
         <td class="text-center"><a href="{{ contact.get_absolute_url }}">{{ contact.response_set.count }}</a></td>
+        <td class="text-center"><a href="{{ contact.get_absolute_url }}">{{ contact.messagelog_set.count }}</a></td>
         <td><a href="{{ contact.get_absolute_url }}">{{ contact.get_preferred_method_display }}</a></td>
       </tr>
       {% endfor %}
