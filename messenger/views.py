@@ -497,6 +497,7 @@ class VoiceCall(View):
         twiml_response = VoiceResponse()
         twiml_response.play(message.recording.url)
         if message.request_for_response:
+            print('REQUEST FOR RESPONSE ACTIVATED')
             twiml_response.record(
                 # action=action,
                 method='POST',

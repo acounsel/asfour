@@ -51,9 +51,13 @@ class ContactAdmin(admin.ModelAdmin):
 
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ('body', 'organization')
-    list_display_links = ('body', 'organization')
-    list_filter = ('organization', )
+    list_display = (
+        'body', 'organization', 'method', 'date_created'
+    )
+    list_display_links = (
+        'body', 'organization', 'method', 'date_created'
+    )
+    list_filter = ('organization', 'method')
 
 @admin.register(MessageLog)
 class MessageLogAdmin(admin.ModelAdmin):

@@ -191,11 +191,13 @@ class Message(models.Model):
 
     def send(self, request=None):
         kwargs = {'msg_id': self.id,}
+        print('sending msg')
         # if request:
         #     if hasattr(request.user, 'userprofile'):
         #         kwargs['user_profile'] = \
         #         request.user.userprofile
         if self.method == 'voice':
+            print('sending voice msg')
             kwargs['voice_uri'] = self.get_voice_uri(request)
         send_messages.delay(**kwargs)
         # self.log_message(contact, request, error)
