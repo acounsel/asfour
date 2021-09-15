@@ -530,10 +530,12 @@ class RecordCall(View):
         phone_number = request.POST.get('To')
         response = Response.objects.create(
             method=Response.VOICE,
+            phone=phone_number,
             recording=request.POST.get('RecordingUrl'),
             sid=session_id,
             organization=message.organization,
         )
+        response.add_contact()
         if 'TranscriptionText' in request.POST:
             response.body = request.POST.get(
                 'TranscriptionText')
@@ -542,7 +544,7 @@ class RecordCall(View):
         twiml_response.say('Thank you, goodbye')
         twiml_response.hangup()
         return HttpResponse(
-            self.get_twiml(),
+            twiml_response,
             content_type='application/xml'
         )
 
