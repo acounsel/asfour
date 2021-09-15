@@ -499,7 +499,10 @@ class VoiceCall(View):
         if message.request_for_response:
             print('REQUEST FOR RESPONSE ACTIVATED')
             twiml_response.record(
-                # action=action,
+                action=reverse('record-call', kwargs={
+                    'pk': message.organization.id,
+                    'msg_id': message.id
+                    }),
                 method='POST',
                 max_length=10,
                 timeout=4,
@@ -511,6 +514,33 @@ class VoiceCall(View):
 
     def post(self, request, **kwargs):
         print('its a post!')
+        return HttpResponse(
+            self.get_twiml(),
+            content_type='application/xml'
+        )
+
+@method_decorator(decorators, name='dispatch')
+class RecordCall(View):
+
+    def post(self, request, **kwargs):
+        message = Message.objects.get(
+            id=self.kwargs.get('msg_id'))
+        session_id = request.POST['CallSid']
+        request_body = request.POST.get('RecordingUrl')
+        phone_number = request.POST.get('To')
+        response = Response.objects.create(
+            method=Response.VOICE,
+            recording=request.POST.get('RecordingUrl'),
+            sid=session_id,
+            organization=message.organization,
+        )
+        if 'TranscriptionText' in request.POST:
+            response.body = request.POST.get(
+                'TranscriptionText')
+            response.save()
+        twiml_response = VoiceResponse()
+        twiml_response.say('Thank you, goodbye')
+        twiml_response.hangup()
         return HttpResponse(
             self.get_twiml(),
             content_type='application/xml'

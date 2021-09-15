@@ -36,7 +36,10 @@ urlpatterns = [
             path('delete/', views.MessageDelete.as_view(), name='message-delete'),
         ])),
         path('call/', include([
-            path('<pk>/voice-call/<msg_id>', views.VoiceCall.as_view(), name='voice-call'),
+            path('<pk>/voice-call/save/<msg_id>', 
+                views.RecordCall.as_view(), name='record-call'),
+            path('<pk>/voice-call/<msg_id>', 
+                views.VoiceCall.as_view(), name='voice-call'),
         ])),
     ])),
     path('autoreplies/', include([
