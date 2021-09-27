@@ -509,7 +509,14 @@ class VoiceCall(View):
                 # transcribe=True,
                 # transcribe_callback=action
             )
-            twiml_response.say('Thank you, goodbye')
+            # twiml_response.say('Thank you, goodbye')
+        twiml_response.redirect(
+            reverse(
+                'voice-call', kwargs={
+                    'pk': message.organization.id,
+                    'msg_id': message.id
+                }
+            ), method='GET')
         return twiml_response
 
     def post(self, request, **kwargs):
@@ -540,13 +547,14 @@ class RecordCall(View):
             response.body = request.POST.get(
                 'TranscriptionText')
             response.save()
-        twiml_response = VoiceResponse()
-        twiml_response.say('Thank you, goodbye')
-        twiml_response.hangup()
-        return HttpResponse(
-            twiml_response,
-            content_type='application/xml'
-        )
+        # twiml_response = VoiceResponse()
+        # twiml_response.say('Thank you, goodbye')
+        # twiml_response.hangup()
+        # return HttpResponse(
+        #     twiml_response,
+        #     content_type='application/xml'
+        # )
+        return 200
 
 @method_decorator(decorators, name='dispatch')
 class StatusCallback(View):
