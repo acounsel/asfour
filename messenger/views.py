@@ -563,7 +563,7 @@ class RecordCall(View):
                     'pk': message.organization.id,
                     'msg_id': message.id
                 }
-            ), method='GET')
+            ), method='POST')
         return HttpResponse(
             twiml_response,
             content_type='application/xml'
