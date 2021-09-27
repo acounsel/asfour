@@ -550,7 +550,7 @@ class RecordCall(View):
             response.body = request.POST.get(
                 'TranscriptionText')
             response.save()
-        # twiml_response = VoiceResponse()
+        twiml_response = VoiceResponse()
         # twiml_response.say('Thank you, goodbye')
         # twiml_response.hangup()
         # return HttpResponse(
