@@ -196,7 +196,16 @@ class ContactList(ContactView, OrgListView):
             'response_set', 'messagelog_set')
 
 class ContactDetail(ContactView, OrgDetailView):
-    pass
+    
+    def post(self, request, **kwargs):
+        contact = self.get_object()
+        if request.POST.get('body'):
+            contact.send_sms(request.POST.get('body'))
+            messages.success(request, 
+                'Message Sent.')
+        return redirect(reverse(
+            'contact-detail', kwargs={'pk':contact.id}
+        ))
 
 class ContactCreate(ContactView, OrgCreateView):
     pass
@@ -510,13 +519,7 @@ class VoiceCall(View):
                 # transcribe_callback=action
             )
             # twiml_response.say('Thank you, goodbye')
-        twiml_response.redirect(
-            reverse(
-                'voice-call', kwargs={
-                    'pk': message.organization.id,
-                    'msg_id': message.id
-                }
-            ), method='GET')
+        
         return twiml_response
 
     def post(self, request, **kwargs):
@@ -554,7 +557,17 @@ class RecordCall(View):
         #     twiml_response,
         #     content_type='application/xml'
         # )
-        return 200
+        twiml_response.redirect(
+            reverse(
+                'voice-call', kwargs={
+                    'pk': message.organization.id,
+                    'msg_id': message.id
+                }
+            ), method='GET')
+        return HttpResponse(
+            twiml_response,
+            content_type='application/xml'
+        )
 
 @method_decorator(decorators, name='dispatch')
 class StatusCallback(View):

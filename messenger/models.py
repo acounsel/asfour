@@ -120,6 +120,36 @@ class Contact(models.Model):
     #         self.tags.add(tag)
     #         super(Contact, self).save(*args, **kwargs)
 
+    def send_sms(self, body):
+        account_sid, auth_token, phone = self.organization \
+        .get_credentials()
+        client = Client(account_sid, auth_token)
+        try:
+            msg = client.messages.create(
+                to=self.phone,
+                from_=phone,
+                body=body,
+                status_callback='{}{}'.format(
+                    'https://www.3asfour.com',
+                    reverse('status-callback', kwargs={
+                        'pk':self.organization.id
+                    }),
+                )
+            )
+            sid = getattr(msg, 'sid', None)
+            error = ''
+        except Exception as e:
+            sid = ''
+            error = e
+        log = MessageLog.objects.create(
+            organization=self.organization,
+            text=body,
+            contact=self,
+            sid=sid,
+            error=error,
+        )
+        return True
+
     def get_absolute_url(self):
         return reverse('contact-detail', 
             kwargs={'pk':self.id})
@@ -273,7 +303,8 @@ class MessageLog(models.Model):
     )
     sid = models.CharField(max_length=255, blank=True)
     message = models.ForeignKey(Message, 
-        on_delete=models.CASCADE)
+        on_delete=models.CASCADE, blank=True, null=True)
+    text = models.TextField(blank=True)
     status = models.CharField(max_length=40, 
         choices=STATUS_CHOICES, default=SUCCESS)
     twilio_status = models.CharField(max_length=200, 
@@ -295,10 +326,15 @@ class MessageLog(models.Model):
 
     def __str__(self):
         return '{0} sent to {1} on {2}'.format(
-            self.message.body,
+            self.text,
             self.contact.get_full_name(),
             self.date
         )
+
+    def save(self, *args, **kwargs):
+        if self.message and not self.text:
+            self.text = self.message.body
+        super(MessageLog, self).save(*args, **kwargs)
 
     def get_status(self):
         if self.twilio_status:

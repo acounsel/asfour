@@ -21,6 +21,11 @@
   <p><strong>{{ message.date_received }}: </strong>{{ message.body }}</p>
   {% endfor %}
   {% include 'addins/notes.html' %}
- 
+  <h3>Send Message</h3>
+  <form action="" method="POST" style="max-width: 600px;">
+    {% csrf_token %}
+    <textarea name="body" class="textarea form-control my-2"></textarea>
+    <input type="submit" value="Send" class="btn btn-primary mt-2">
+  </form>
 </div>
 {% endblock %}
