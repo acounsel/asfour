@@ -9,8 +9,8 @@
   <table class="table" data-sorting="true">
     <thead>
       <tr>
-        <th scope="col">Date</th>
-        <th scope="col">Text</th>
+        <th scope="col" data-type="date" data-format-string="YYYY/MM/DD">Date</th>
+        <th scope="col">Name</th>
         <th scope="col">Method</th>
         <th scope="col">Attachment</th>
         <th scope="col">Contacts</th>
@@ -20,8 +20,8 @@
     <tbody>
       {% for message in message_list %}
       <tr>
-        <th scope="row">{{ message.date_created }}</th>
-        <td><a href="{{ message.get_absolute_url }}">{{ message.body }}</a></td>
+        <th scope="row">{{ message.date_created|date:"Y/m/d" }}</th>
+        <td><a href="{{ message.get_absolute_url }}">{{ message.name }}</a></td>
         <td>{{ message.get_method_display }}</td>
         <td>{% if message.recording %}<a href="{{ message.recording.url }}">Recording</a>{% elif message.attachment %}<a href="{{ message.get_absolute_url }}">Image</a>{% endif %}</td>
         <td>{{ message.contacts.count }}</td>

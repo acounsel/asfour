@@ -179,6 +179,7 @@ class Message(models.Model):
         (WHATSAPP, 'WhatsApp'),
         (MIXED, 'Mixed'),
     )
+    name = models.CharField(max_length=255, blank=True)
     body = models.TextField()
     method = models.CharField(max_length=50, 
         choices=MEDIUM_CHOICES, default=SMS)
@@ -197,7 +198,7 @@ class Message(models.Model):
     date_sent = models.DateTimeField(blank=True, null=True)
 
     class Meta:
-        ordering = ('-date_sent', '-date_created')
+        ordering = ('-id',)
 
     def __str__(self):
         return self.body

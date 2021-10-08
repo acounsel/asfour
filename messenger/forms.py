@@ -5,8 +5,9 @@ from .models import Contact, Message, Organization, Tag
 class MessageForm(forms.ModelForm):
     class Meta:
         model = Message
-        fields = ('method', 'body', 'attachment', 'recording', 
-        'tags', 'contacts', 'request_for_response')
+        fields = ('name', 'method', 'body', 'attachment', 
+            'recording', 'tags', 'contacts', 
+            'request_for_response')
 
     def __init__(self, *args, **kwargs):
         user_profile = kwargs.pop('user_profile')

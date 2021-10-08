@@ -2,7 +2,7 @@
 {% block body %}
 <h1>{{ message.get_method_display }} Message</h1>
 <div class="card p-4 MessageDetail">
-  <h2 class="h3">{{ message.body }}</h2>
+  <h2 class="h3">{{ message.name }}</h2>
   {% if message.attachment %}
   <img src="{{ message.attachment.url }}" class="w-25">
   {% endif %}
@@ -36,6 +36,9 @@
   <div class="card p-3 MessageCards" style="margin: 0 1rem;">
     <div id="id_messageSend" class="collapse show">
       <p><strong>Status: {% if message.date_sent %}Sent{% else %}Unsent{% endif %}</strong></p>
+      {% if message.method != 'voice' %}
+      <p>Text: {{ message.body }}</p>
+      {% endif %}
       <p>Date Created: {{ message.date_created }}</p>
       {% if message.date_sent %}
       <p>Date Sent: {{ message.date_sent }}</p>
