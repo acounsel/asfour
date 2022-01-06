@@ -1,6 +1,6 @@
 Boto3
 redis
-celery==4.4.7
+celery==5.2.2
 django
 django-celery-beat
 django_celery_results
