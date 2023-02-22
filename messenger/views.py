@@ -1,6 +1,7 @@
 import csv
 import datetime
 import io
+import openai
 import re
 
 from django.apps import apps
@@ -681,3 +682,44 @@ class UserUpdate(SuccessMessageMixin, UpdateView):
 
     def get_object(self):
         return self.request.user
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ChatBot(View):
+    openai.api_key = settings.OPENAI_KEY
+    completion = openai.Completion()
+
+    start_sequence = "\nAI:"
+    restart_sequence = "\n\nPerson:"
+    session_prompt = "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly. Person: Hello, who are you? AI: I am an AI created by OpenAI. How can I help you today? Person: "
+
+    def post(self, request, **kwargs):
+        print(request.POST)
+        incoming_msg = request.POST.get('Body')
+        chat_log = self.request.session.get('chat_log')
+        answer = self.ask(incoming_msg, chat_log)
+        self.request.session['chat_log'] = self.append_interaction_to_chat_log(
+            incoming_msg, answer, chat_log)
+        msg = MessagingResponse()
+        msg.message(answer)
+        return HttpResponse(msg)
+
+    def ask(self, question, chat_log=None):
+        prompt_text = f'{chat_log}{self.restart_sequence}: {question}{self.start_sequence}:'
+        response = openai.Completion.create(
+            engine="davinci",
+            prompt=prompt_text,
+            temperature=0.8,
+            max_tokens=1600,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0.3,
+            stop=["\n"],
+        )
+        print(response)
+        story = response['choices'][0]['text']
+        return str(story)
+
+    def append_interaction_to_chat_log(self, question, answer, chat_log=None):
+        if chat_log is None:
+            chat_log = self.session_prompt
+        return f'{chat_log}{self.restart_sequence} {question}{self.start_sequence}{answer}'

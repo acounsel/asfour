@@ -13,5 +13,6 @@ django-import-export
 django-storages
 gunicorn
 ipython
+openai
 sendgrid
 twilio

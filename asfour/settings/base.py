@@ -125,6 +125,8 @@ DEFAULT_FROM_EMAIL = 'admin@3asfour.com'
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 
+OPENAI_KEY = get_env_variable('OPENAI_KEY')
+
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
