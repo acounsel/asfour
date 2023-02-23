@@ -6,7 +6,7 @@ django-celery-beat
 django_celery_results
 django-debug-toolbar
 django_redis_cache
-django-crispy-forms
+django-crispy-forms==1.14.0
 django-extensions
 django-heroku
 django-import-export
