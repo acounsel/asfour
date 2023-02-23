@@ -6,6 +6,7 @@ from .models import (Autoreply, Contact, Message, MessageLog,
     Note, Organization, Response, Tag, UserProfile)
 
 admin.site.register(Organization)
+admin.site.register(Tag)
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
