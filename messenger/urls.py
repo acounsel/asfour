@@ -49,6 +49,7 @@ urlpatterns = [
             path('', views.AutoreplyUpdate.as_view(), name='autoreply-update'),
         ])),
     ])),
+    path('conference/', views.Conference.as_view(), name='chatbot'),
     path('chatbot/', views.ChatBot.as_view(), name='chatbot'),
     path('status-callback/<int:pk>', views.StatusCallback.as_view(), name='status-callback'),
     path('response/<medium>/<int:pk>/', views.HarvestResponse.as_view(), name='harvest-response'),

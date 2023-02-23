@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'storages',
     'django_extensions',
     'crispy_forms',
+    'crispy_bootstrap5',
     'messenger',
     'django_celery_beat',
     'django_celery_results',

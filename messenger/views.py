@@ -29,7 +29,7 @@ from .models import (Autoreply, Contact, Message, MessageLog,
     Note, Organization, Response, Tag, UserProfile)
 from .tasks import send_messages
 
-from twilio.twiml.voice_response import VoiceResponse
+from twilio.twiml.voice_response import VoiceResponse, Dial
 from twilio.twiml.messaging_response import MessagingResponse
 
 
@@ -720,3 +720,29 @@ class ChatBot(View):
         if chat_log is None:
             chat_log = self.session_prompt
         return f'{chat_log}{self.restart_sequence} {question}{self.start_sequence}{answer}'
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class Conference(View):
+
+    def post(self, request, **kwargs):
+        response = VoiceResponse()
+
+        MODERATOR = '+14154938715'
+
+        with Dial() as dial:
+            if request.POST.get('From') == MODERATOR:
+                dial.conference('My conference',
+                    start_conference_on_enter=True,
+                    end_conference_on_exit=True
+                )
+            else:
+                dial.conference('My conference', 
+                    start_conference_on_enter=False)
+
+        response.append(dial)
+        return HttpResponse(response,
+            content_type='application/xml'
+        )
+
+# participant = client.conferences(session_id).participants.create(from_='+14066627742',to=phone)
