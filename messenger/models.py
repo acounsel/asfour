@@ -6,7 +6,9 @@ from django.urls import reverse
 
 from asfour.storage_backends import PrivateMediaStorage
 from asfour.storage_backends import PublicMediaStorage
+
 from twilio.rest import Client
+from twilio.twiml.voice_response import VoiceResponse, Dial
 
 from .functions import send_email
 from .tasks import task_send_email, send_messages
@@ -47,6 +49,7 @@ class UserProfile(models.Model):
         on_delete=models.CASCADE)
     organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=50, blank=True)
     is_admin = models.BooleanField(default=False)
 
     def __str__(self):
@@ -92,6 +95,7 @@ class Contact(models.Model):
     tags = models.ManyToManyField(Tag, blank=True)
     has_consented = models.BooleanField(default=False)
     has_whatsapp = models.BooleanField(default=False)
+    is_international = models.BooleanField(default=False)
     is_unsubscribed = models.BooleanField(default=False)
 
     class Meta:
@@ -103,7 +107,9 @@ class Contact(models.Model):
 
     def save(self, *args, **kwargs):
         if '+' not in self.phone:
-            self.phone = '+1' + self.phone
+            if not self.is_international:
+                self.phone = '1' + self.phone
+            self.phone = '+' + self.phone
         super(Contact, self).save(*args, **kwargs)
 
     # def save(self, *args, **kwargs):
@@ -172,11 +178,13 @@ class Message(models.Model):
     EMAIL = 'email'
     WHATSAPP = 'whatsapp'
     MIXED = 'mixed'
+    CONFERENCE = 'conference'
     MEDIUM_CHOICES = (
         (SMS, 'SMS'),
         (VOICE, 'Voice'),
         (EMAIL, 'Email'),
         (WHATSAPP, 'WhatsApp'),
+        (CONFERENCE, 'Conference Call'),
         (MIXED, 'Mixed'),
     )
     name = models.CharField(max_length=255, blank=True)
@@ -194,6 +202,8 @@ class Message(models.Model):
     organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE)
     request_for_response = models.BooleanField(default=False)
+    created_by = models.ForeignKey(UserProfile, 
+        on_delete=models.SET_NULL, blank=True, null=True)
     date_created = models.DateField(auto_now_add=True)
     date_sent = models.DateTimeField(blank=True, null=True)
 
@@ -294,6 +304,45 @@ class Message(models.Model):
         segs = self.get_segments()
         contacts = self.contacts.count()
         return round(segs * contacts / 180)
+
+    def get_moderator(self):
+        if self.created_by:
+            return self.created_by.phone
+        elif self.organization.forward_phone:
+            return self.organization.forward_phone
+        else:
+            return '+14154938715'
+
+    def conference_call(self):
+        response = VoiceResponse()
+        account_sid, auth_token, phone = \
+            self.organization.get_credentials()
+        client = Client(account_sid, auth_token)
+        call = client.calls.create(from_="client:"+phone, 
+            to="client:"+self.get_moderator(),
+            url='https://www.3asfour.com/{}'.format(
+                reverse('conference-call', 
+                    kwargs={'session_id':str(self.name)})
+            ),
+            status_callback_event=['completed'],
+        )
+        # with Dial() as dial:
+        #     if request.POST.get('From') == self.get_moderator():
+        #         dial.conference(self.name,
+        #             start_conference_on_enter=True,
+        #             end_conference_on_exit=False,
+        #             record='record-from-start',
+        #         )
+        #     else:
+        #         dial.conference(self.name, 
+        #             start_conference_on_enter=False)
+        # response.append(dial)
+        
+        for contact in self.contacts.all():
+            client.conferences(self.name).participants.create(
+                from_=phone, to=contact.phone)
+        return True
+
 
 class MessageLog(models.Model):
     SUCCESS = 'success'

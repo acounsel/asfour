@@ -402,8 +402,12 @@ class MessageSend(MessageDetail):
         response = super().get(request, **kwargs)
         context = self.get_context_data(**kwargs)
         message = self.get_object()
-        message.send(request)
-        messages.success(request, 'Message Sent!')
+        if message.method == Message.CONFERENCE:
+            message.conference_call()
+            messages.success(request, 'Call Initiated!')
+        else:
+            message.send(request)
+            messages.success(request, 'Message Sent!')
         return redirect(message.get_absolute_url())
 
 class MessageLogList(OrgListView):
@@ -731,17 +735,23 @@ class Conference(View):
     def post(self, request, **kwargs):
         response = VoiceResponse()
 
+        
         MODERATOR = '+14154938715'
-
+        print(self.kwargs.get('session_id'))
         with Dial() as dial:
-            if request.POST.get('From') == MODERATOR:
-                dial.conference('My conference',
-                    start_conference_on_enter=True,
-                    end_conference_on_exit=True
-                )
-            else:
-                dial.conference('My conference', 
-                    start_conference_on_enter=False)
+            dial.conference(self.kwargs.get('session_id'),
+                waitUrl='',
+                # status_callback=app.config['MY_URL']+'/leave',
+                # status_callback_event="leave"
+            )
+            # if request.POST.get('From') == MODERATOR:
+            #     dial.conference('My conference',
+            #         start_conference_on_enter=True,
+            #         end_conference_on_exit=False
+            #     )
+            # else:
+            #     dial.conference('My conference', 
+            #         start_conference_on_enter=False)
 
         response.append(dial)
         return HttpResponse(response,
