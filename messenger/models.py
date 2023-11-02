@@ -174,7 +174,7 @@ class Contact(models.Model):
         return '{0} {1}'.format(
             self.first_name, self.last_name)
 
-    def extract_email(input_string):
+    def extract_email(self, input_string):
         print('EXTRACING {}'.format(input_string))
         input_string = input_string.strip()
         email_regex = re.compile(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}')
