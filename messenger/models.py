@@ -175,6 +175,7 @@ class Contact(models.Model):
             self.first_name, self.last_name)
 
     def extract_email(input_string):
+        print('EXTRACING {}'.format(input_string))
         input_string = input_string.strip()
         email_regex = re.compile(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}')
         potential_emails = re.findall(email_regex, input_string)
@@ -184,7 +185,9 @@ class Contact(models.Model):
             return None
 
     def add_email(self, email_input):
+        print('EXTRACTING EMAIL')
         email = self.extract_email(email_input)
+        print('EMAIL CLEANED: {}'.format(email))
         if email:
             self.email = email
             self.save()
@@ -474,7 +477,9 @@ class Response(models.Model):
         contact, created = Contact.objects.get_or_create(
             phone=self.phone, organization=self.organization)
         if not created:
+            print('EXISTING CONTACT')
             if not contact.has_email:
+                print('ADDING EMAIL')
                 contact.add_email(self.body)
         self.contact = contact
         self.save()
