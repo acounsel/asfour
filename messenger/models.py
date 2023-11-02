@@ -1,4 +1,5 @@
 import datetime
+import re
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -41,6 +42,9 @@ class Organization(models.Model):
             if response.body.lower() == reply.text.lower():
                 reply.add_tags(response.contact)
                 return reply.reply
+        if response.contact:
+            if not response.contact.has_email:
+                return "Thank you. Please reply with your email address (no other text)"
         return self.response_msg
 
 class UserProfile(models.Model):
@@ -97,6 +101,8 @@ class Contact(models.Model):
     has_whatsapp = models.BooleanField(default=False)
     is_international = models.BooleanField(default=False)
     is_unsubscribed = models.BooleanField(default=False)
+    has_name = models.BooleanField(default=False)
+    has_email = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('first_name',)
@@ -167,6 +173,21 @@ class Contact(models.Model):
     def get_full_name(self):
         return '{0} {1}'.format(
             self.first_name, self.last_name)
+
+    def extract_email(input_string):
+        input_string = input_string.strip()
+        email_regex = re.compile(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}')
+        potential_emails = re.findall(email_regex, input_string)
+        if potential_emails:
+            return potential_emails[0]
+        else:
+            return None
+
+    def add_email(self, email_input):
+        email = self.extract_email(email_input)
+        if email:
+            self.email = email
+            self.save()
 
     # def get_absolute_url(self):
     #     return reverse('contact-list') + '
@@ -452,6 +473,9 @@ class Response(models.Model):
             self.phone = self.phone.split(':')[1]
         contact, created = Contact.objects.get_or_create(
             phone=self.phone, organization=self.organization)
+        if not created:
+            if not contact.has_email:
+                contact.add_email(self.body)
         self.contact = contact
         self.save()
 
