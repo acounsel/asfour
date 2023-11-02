@@ -190,6 +190,7 @@ class Contact(models.Model):
         print('EMAIL CLEANED: {}'.format(email))
         if email:
             self.email = email
+            self.has_email = True
             self.save()
 
     # def get_absolute_url(self):
