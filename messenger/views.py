@@ -612,13 +612,17 @@ class HarvestResponse(View):
 
     def post(self, request, **kwargs):
         resp = 200
+        print('starting')
         org = Organization.objects.get(
             id=self.kwargs.get('pk'))
         resp_kwargs, save = self.get_response_kwargs(
             request, org)
+        print(resp_kwargs)
         if save:
+            print('saving!')
             response = Response.objects.create(**resp_kwargs)
             response.add_contact()
+            print(response)
             if self.kwargs.get('medium') == 'message':
                 resp = self.sms_forward_and_respond(
                     org, response)
