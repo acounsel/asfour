@@ -44,7 +44,7 @@ class Organization(models.Model):
                 return reply.reply
         if response.contact:
             if not response.contact.has_email:
-                return "Thank you. Please reply with your email address (no other text)"
+                return "Thank you for subscribing. Please reply with your email address or STOP to unsubscribe"
         return self.response_msg
 
 class UserProfile(models.Model):
@@ -478,9 +478,7 @@ class Response(models.Model):
         contact, created = Contact.objects.get_or_create(
             phone=self.phone, organization=self.organization)
         if not created:
-            print('EXISTING CONTACT')
             if not contact.has_email:
-                print('ADDING EMAIL')
                 contact.add_email(self.body)
         self.contact = contact
         self.save()
