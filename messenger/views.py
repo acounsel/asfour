@@ -495,6 +495,12 @@ class AutoreplyView(View):
     fields = ('text', 'reply', 'tags')
     success_url = reverse_lazy('autoreply-list')
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['tags'].queryset = Tag.objects.filter(
+            organization=self.request.user.userprofile.organization)
+        return form
+
 class AutoreplyCreate(AutoreplyView, OrgCreateView):
     pass
 
@@ -617,12 +623,9 @@ class HarvestResponse(View):
             id=self.kwargs.get('pk'))
         resp_kwargs, save = self.get_response_kwargs(
             request, org)
-        print(resp_kwargs)
         if save:
-            print('saving!')
             response = Response.objects.create(**resp_kwargs)
             response.add_contact()
-            print(response)
             if self.kwargs.get('medium') == 'message':
                 resp = self.sms_forward_and_respond(
                     org, response)

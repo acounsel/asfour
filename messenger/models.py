@@ -46,6 +46,21 @@ class Organization(models.Model):
             if not response.contact.has_email:
                 return "Thank you for subscribing. Please reply with your email address or STOP to unsubscribe"
         return self.response_msg
+    
+    def transfer(self):
+        btb = Organization.objects.get(id=4)
+        wrong_list = Tag.objects.get(id=279)
+        btb_transfers = Tag.objects.get(id=280)
+        contacts = self.contact_set.filter(tags=wrong_list)
+        counter = 0
+        for contact in contacts:
+            contact.tags.remove(wrong_list)
+            contact.tags.add(btb_transfers)
+            contact.organization = btb
+            contact.save()
+            counter += 1
+        return '{} contacts transfered'.format(counter)
+            
 
 class UserProfile(models.Model):
 
