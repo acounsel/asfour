@@ -147,6 +147,9 @@ class Contact(models.Model):
     #         self.tags.add(tag)
     #         super(Contact, self).save(*args, **kwargs)
 
+    def get_all_messages(self):
+        outgoing = 
+
     def send_sms(self, body):
         account_sid, auth_token, phone = self.organization \
         .get_credentials()
@@ -403,7 +406,7 @@ class MessageLog(models.Model):
         Organization, on_delete=models.CASCADE)
     contact = models.ForeignKey(Contact, 
         on_delete=models.SET_NULL, blank=True, null=True)
-    date = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
     sender = models.ForeignKey(UserProfile,
         on_delete=models.SET_NULL, blank=True, null=True)
     error = models.TextField(blank=True)
@@ -477,7 +480,7 @@ class Response(models.Model):
     body = models.TextField(blank=True)
     recording = models.CharField(max_length=255, blank=True)
     sid = models.CharField(max_length=255, blank=True)
-    date_received = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
     organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE)
 

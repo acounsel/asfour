@@ -289,6 +289,30 @@ class ContactImport(ContactList):
         contact.save()
         return contact
 
+class ContactTransfer(ContactImport):
+
+    def import_contact_row(self, contact_dict, org):
+        print(contact_dict)
+        phone = re.sub("[^0-9]", "", contact_dict['phone'])
+        if '+' not in phone:
+            phone = '+1' + phone
+        print('adding {}'.format(phone))  
+        contact, created = Contact.objects.get_or_create(
+            phone=phone,
+            organization=org)
+        print(contact, created)
+        contact.first_name = contact_dict['first_name']
+        contact.last_name = contact_dict['last_name']
+        contact.email = contact_dict['email']
+        for tagname in ('tag1', 'tag2', 'tag3'):
+            if contact_dict.get(tagname):
+                tag, created = Tag.objects.get_or_create(
+                    name=contact_dict[tagname],
+                    organization=org)
+                contact.tags.add(tag)
+        contact.save()
+        return contact
+
 class MessageView(View):
     model = Message
     form_class = MessageForm
