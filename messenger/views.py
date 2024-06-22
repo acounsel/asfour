@@ -430,6 +430,7 @@ class MessageSend(MessageDetail):
             messages.success(request, 'Call Initiated!')
         else:
             message.send(request)
+            print('message sent')
             messages.success(request, 'Message Sent!')
         return redirect(message.get_absolute_url())
 

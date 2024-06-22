@@ -38,6 +38,7 @@ def message_log(MessageLog, message, contact, user_profile,
 
 @app.task
 def send_messages(msg_id, voice_uri=None, user_profile=None):
+    print('async send')
     Message = apps.get_model(app_label='messenger', 
         model_name='Message')
     MessageLog = apps.get_model(app_label='messenger', 
