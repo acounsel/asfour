@@ -39,7 +39,7 @@ class Organization(models.Model):
 
     def get_reply_msg(self, response):
         for reply in self.autoreply_set.all():
-            if response.body.lower() == reply.text.lower():
+            if response.body.lower().strip() == reply.text.lower():
                 reply.add_tags(response.contact)
                 return reply.reply
         if response.contact:
@@ -79,6 +79,7 @@ class Tag(models.Model):
     name = models.CharField(max_length=255)
     organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
@@ -146,9 +147,6 @@ class Contact(models.Model):
     #     if tag:
     #         self.tags.add(tag)
     #         super(Contact, self).save(*args, **kwargs)
-
-    def get_all_messages(self):
-        outgoing = 
 
     def send_sms(self, body):
         account_sid, auth_token, phone = self.organization \
@@ -415,7 +413,7 @@ class MessageLog(models.Model):
     is_finished = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ['-date', '-id']
+        ordering = ['-timestamp', '-id']
 
     def __str__(self):
         return '{0} sent to {1} on {2}'.format(
@@ -485,7 +483,7 @@ class Response(models.Model):
         Organization, on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ('-date_received',)
+        ordering = ('-timestamp',)
 
     def __str__(self):
         return self.body

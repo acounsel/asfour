@@ -62,8 +62,8 @@ class MessageAdmin(admin.ModelAdmin):
 
 @admin.register(MessageLog)
 class MessageLogAdmin(admin.ModelAdmin):
-    list_display = ('message', 'contact', 'date', 'sender')
-    list_display_links = ('message', 'contact', 'date', 'sender')
+    list_display = ('message', 'contact', 'timestamp', 'sender')
+    list_display_links = ('message', 'contact', 'timestamp', 'sender')
     list_filter = ('message__organization', 'contact', 'message' )
 
 @admin.register(Response)

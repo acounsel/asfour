@@ -10,6 +10,7 @@
       <tr>
         <th scope="col">Name</th>
         <th scope="col">Contacts</th>
+        <th scope="col">Active</th>
       </tr>
     </thead>
     <tbody>
@@ -17,6 +18,7 @@
       <tr>
         <th scope="row"><a href="{{ tag.get_absolute_url }}">{{ tag.name }}</a></th>
         <td>{{ tag.contact_set.count }}</td>
+        <td>{{ tag.is_active }}</td>
       </tr>
       {% endfor %}
     </tbody>
