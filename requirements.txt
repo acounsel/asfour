@@ -7,7 +7,7 @@ django-celery-beat>=2.2.0
 django_celery_results==2.5.1
 django-debug-toolbar==4.2.0
 django_redis_cache
-django-crispy-forms
+django-crispy-forms==1.14.0
 django-extensions
 django-heroku
 django-import-export
