@@ -331,6 +331,12 @@ class MessageView(View):
         context['add_all_bool'] = True
         return context
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['tags'].queryset = Tag.objects.filter(
+            is_active=True)
+        return form
+
     def get_form_kwargs(self):
         kwargs = super(MessageView, self).get_form_kwargs()
         kwargs['user_profile'] = self.request.user.userprofile
@@ -430,7 +436,6 @@ class MessageSend(MessageDetail):
             messages.success(request, 'Call Initiated!')
         else:
             message.send(request)
-            print('message sent')
             messages.success(request, 'Message Sent!')
         return redirect(message.get_absolute_url())
 

@@ -6,7 +6,17 @@ from .models import (Autoreply, Contact, Message, MessageLog,
     Note, Organization, Response, Tag, UserProfile)
 
 admin.site.register(Organization)
-admin.site.register(Tag)
+
+@admin.register(Tag)
+class TagADmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'name',
+        'organization',
+        'is_active'
+    )
+    list_display_links = list_display
+    list_filter = ('organization', 'is_active')
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
