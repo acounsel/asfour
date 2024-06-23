@@ -334,6 +334,7 @@ class MessageView(View):
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
         form.fields['tags'].queryset = Tag.objects.filter(
+            organization=self.request.user.userprofile.organization,
             is_active=True)
         return form
 
