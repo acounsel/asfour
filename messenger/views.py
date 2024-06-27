@@ -227,11 +227,11 @@ class ContactImport(ContactList):
         except KeyError:
             messages.error(request, 'Please upload a file.')
         else:
-            errors = self.import_csv_data(import_file, 
+            errors, new_count = self.import_csv_data(import_file, 
                 organization=organization)
             print(errors)
             messages.success(request, 
-                'Contacts successfully uploaded.')
+                'Contacts successfully uploaded. {} New'.format(new_count))
         return redirect(reverse('home'))
 
     def import_csv_data(self, import_file, organization):
@@ -250,33 +250,37 @@ class ContactImport(ContactList):
                 'Failed to read file. Please make sure \
                 the file is in CSV format.')
         else:
-            errors = self.enumerate_rows(reader, organization)
-        return errors
+            errors, new_count = self.enumerate_rows(reader, organization)
+        return errors, new_count
 
     # Loop through CSV, skipping header row.
     def enumerate_rows(self, reader, org, start=1):
         row_errors = []
+        new_count = 0
         # Index is for row numbers in error message-s.
         for index, contact in enumerate(reader, start=1):
             row_errors = []
             try:
-                self.import_contact_row(contact, org)
+                created = self.import_contact_row(contact, org)
+                if created:
+                    new_count += 1
             except Exception as error:
                 print(error)
                 row_errors.append('Row {0}: {1}'.format(
                     index, error))
-        return row_errors
+        return row_errors, new_count
 
     def import_contact_row(self, contact_dict, org):
-        print(contact_dict)
+        new_contacts = 0
         phone = re.sub("[^0-9]", "", contact_dict['phone'])
         if '+' not in phone:
-            phone = '+1' + phone
-        print('adding {}'.format(phone))  
+            if len(phone) == 10:
+                phone = '+1' + phone
+            elif len(phone) == 11 and phone[0] == '1':
+                phone = '+' + phone
         contact, created = Contact.objects.get_or_create(
             phone=phone,
             organization=org)
-        print(contact, created)
         contact.first_name = contact_dict['first_name']
         contact.last_name = contact_dict['last_name']
         contact.email = contact_dict['email']
@@ -287,7 +291,7 @@ class ContactImport(ContactList):
                     organization=org)
                 contact.tags.add(tag)
         contact.save()
-        return contact
+        return created
 
 class MessageView(View):
     model = Message
@@ -587,7 +591,6 @@ class RecordCall(View):
 class StatusCallback(View):
     
     def post(self, request, **kwargs):
-        print('STATUS CALLBACK TRIGGERED')
         resp = 200
         org = Organization.objects.get(
             id=self.kwargs.get('pk'))
@@ -603,8 +606,6 @@ class StatusCallback(View):
         except:
             print('STATUS UPDATE FAILED')
             resp = 400
-        print(request.POST)
-        print(self.kwargs)
         return HttpResponse(resp)
 
     def get_callback_dict(self, request):

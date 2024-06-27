@@ -39,7 +39,7 @@ class Organization(models.Model):
 
     def get_reply_msg(self, response):
         for reply in self.autoreply_set.all():
-            if response.body.lower() == reply.text.lower():
+            if response.body.lower().strip() == reply.text.lower():
                 reply.add_tags(response.contact)
                 return reply.reply
         if response.contact:
