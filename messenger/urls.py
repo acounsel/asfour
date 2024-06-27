@@ -50,7 +50,7 @@ urlpatterns = [
         ])),
     ])),
     path('conference/<session_id>/', views.Conference.as_view(), name='conference-call'),
-    path('chatbot/', views.ChatBot.as_view(), name='chatbot'),
+    # path('chatbot/', views.ChatBot.as_view(), name='chatbot'),
     path('status-callback/<int:pk>', views.StatusCallback.as_view(), name='status-callback'),
     path('response/<medium>/<int:pk>/', views.HarvestResponse.as_view(), name='harvest-response'),
     path('responses/', include([

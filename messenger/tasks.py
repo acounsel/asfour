@@ -55,9 +55,11 @@ def send_messages(msg_id, voice_uri=None, user_profile=None):
             msg = client_action.create(**kwargs)
             sid = getattr(msg, 'sid', None)
             error = ""
+            print('sent!')
         except Exception as e:
             sid = ""
             error = e
+            print(error)
         log = message_log(MessageLog, message, contact, 
             user_profile, sid, error)
         log.save()

@@ -79,6 +79,7 @@ class Tag(models.Model):
     name = models.CharField(max_length=255)
     organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
@@ -403,7 +404,7 @@ class MessageLog(models.Model):
         Organization, on_delete=models.CASCADE)
     contact = models.ForeignKey(Contact, 
         on_delete=models.SET_NULL, blank=True, null=True)
-    date = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
     sender = models.ForeignKey(UserProfile,
         on_delete=models.SET_NULL, blank=True, null=True)
     error = models.TextField(blank=True)
@@ -412,7 +413,7 @@ class MessageLog(models.Model):
     is_finished = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ['-date', '-id']
+        ordering = ['-timestamp', '-id']
 
     def __str__(self):
         return '{0} sent to {1} on {2}'.format(
@@ -477,12 +478,12 @@ class Response(models.Model):
     body = models.TextField(blank=True)
     recording = models.CharField(max_length=255, blank=True)
     sid = models.CharField(max_length=255, blank=True)
-    date_received = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
     organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ('-date_received',)
+        ordering = ('-timestamp',)
 
     def __str__(self):
         return self.body

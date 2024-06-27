@@ -6,7 +6,17 @@ from .models import (Autoreply, Contact, Message, MessageLog,
     Note, Organization, Response, Tag, UserProfile)
 
 admin.site.register(Organization)
-admin.site.register(Tag)
+
+@admin.register(Tag)
+class TagADmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'name',
+        'organization',
+        'is_active'
+    )
+    list_display_links = list_display
+    list_filter = ('organization', 'is_active')
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
@@ -62,8 +72,8 @@ class MessageAdmin(admin.ModelAdmin):
 
 @admin.register(MessageLog)
 class MessageLogAdmin(admin.ModelAdmin):
-    list_display = ('message', 'contact', 'date', 'sender')
-    list_display_links = ('message', 'contact', 'date', 'sender')
+    list_display = ('message', 'contact', 'timestamp', 'sender')
+    list_display_links = ('message', 'contact', 'timestamp', 'sender')
     list_filter = ('message__organization', 'contact', 'message' )
 
 @admin.register(Response)

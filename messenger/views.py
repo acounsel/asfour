@@ -157,7 +157,7 @@ class OrgUpdateView(LoginRequiredMixin, UpdateView):
 
 class TagView(View):
     model = Tag
-    fields = ('name',)
+    fields = ('name','is_active')
     success_url = reverse_lazy('tag-list')
 
 class TagList(TagView, OrgListView):
@@ -293,6 +293,30 @@ class ContactImport(ContactList):
         contact.save()
         return created
 
+class ContactTransfer(ContactImport):
+
+    def import_contact_row(self, contact_dict, org):
+        print(contact_dict)
+        phone = re.sub("[^0-9]", "", contact_dict['phone'])
+        if '+' not in phone:
+            phone = '+1' + phone
+        print('adding {}'.format(phone))  
+        contact, created = Contact.objects.get_or_create(
+            phone=phone,
+            organization=org)
+        print(contact, created)
+        contact.first_name = contact_dict['first_name']
+        contact.last_name = contact_dict['last_name']
+        contact.email = contact_dict['email']
+        for tagname in ('tag1', 'tag2', 'tag3'):
+            if contact_dict.get(tagname):
+                tag, created = Tag.objects.get_or_create(
+                    name=contact_dict[tagname],
+                    organization=org)
+                contact.tags.add(tag)
+        contact.save()
+        return contact
+
 class MessageView(View):
     model = Message
     form_class = MessageForm
@@ -311,13 +335,19 @@ class MessageView(View):
         context['add_all_bool'] = True
         return context
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['tags'].queryset = Tag.objects.filter(
+            organization=self.request.user.userprofile.organization,
+            is_active=True)
+        return form
+
     def get_form_kwargs(self):
         kwargs = super(MessageView, self).get_form_kwargs()
         kwargs['user_profile'] = self.request.user.userprofile
         return kwargs   
 
     def form_valid(self, form):
-        print(self.request.POST)
         response = super().form_valid(form)
         contacts = Contact.objects.filter(
             tags__in=self.object.tags.all()).distinct()
@@ -356,36 +386,36 @@ class MessageDetail(MessageView, OrgDetailView):
         return context
 
     def get_contacts(self, message):
-        contacts = message.contacts.prefetch_related(
-            'messagelog_set', 'tags')
-        contact_list = []
-        messagelogs = MessageLog.objects.filter(
-            message=message).values_list('contact', flat=True)
-        for contact in contacts:
-            if contact.id in messagelogs:
-                status = 'Sent'
-            else:
-                status = 'Unsent'
-            contact_list.append({
-                'url': contact.get_absolute_url(),
-                'first_name': contact.first_name,
-                'last_name': contact.last_name,
-                'phone': contact.phone,
-                'tags': ', '.join(
-                    tag.name for tag in contact.tags.all()),
-                'status': status,
-            })
-        return contact_list
+        # contacts = message.contacts.prefetch_related(
+        #     'messagelog_set', 'tags')
+        # contact_list = []
+        # messagelogs = MessageLog.objects.filter(
+        #     message=message).values_list('contact', flat=True)
+        # for contact in contacts:
+        #     if contact.id in messagelogs:
+        #         status = 'Sent'
+        #     else:
+        #         status = 'Unsent'
+        #     contact_list.append({
+        #         'url': contact.get_absolute_url(),
+        #         'first_name': contact.first_name,
+        #         'last_name': contact.last_name,
+        #         'phone': contact.phone,
+        #         'tags': ', '.join(
+        #             tag.name for tag in contact.tags.all()),
+        #         'status': status,
+        #     })
+        return message.contacts.prefetch_related('tags')
 
     def get_responses(self, message):
         if message.date_sent:
             rdict = {
                 'contact__in': message.contacts.all(),
-                'date_received__gt': message.date_sent,
+                'timestamp__gt': message.date_sent,
             }
             next_msg = message.next()
             if next_msg:
-                rdict['date_received__lte'] = next_msg.date_sent
+                rdict['timestamp__lte'] = next_msg.date_sent
             responses = Response.objects.filter(
                 **rdict).select_related('contact').distinct()
             return responses
@@ -441,11 +471,11 @@ class ResponseExport(ResponseList):
             message = Message.objects.get(
                 id=self.request.GET.get('msg_id'))
             queryset = queryset.filter(
-                date_received__gt=message.date_sent)
+                timestamp__gt=message.date_sent)
             if message.next():
                 next_msg = message.next()
                 queryset = queryset.filter(
-                    date_received__lte=next_msg.date_sent)
+                    timestamp__lte=next_msg.date_sent)
         return queryset
 
     def get(self, request, **kwargs):
@@ -465,7 +495,7 @@ class ResponseExport(ResponseList):
 
     def get_response_list(self, queryset):
         header = ['phone', 'first_name', 'last_name', 'tags',
-        'response', 'method', 'recording', 'date_received',
+        'response', 'method', 'recording', 'timestamp',
         'last_message_received']
         rows = [header,]
         for response in queryset:
@@ -489,7 +519,7 @@ class ResponseExport(ResponseList):
             response.body,
             response.get_method_display(),
             getattr(response.recording, 'url', None),
-            response.date_received,
+            response.timestamp,
             response.get_most_recent_message()
         ]
         return row
@@ -695,46 +725,46 @@ class UserUpdate(SuccessMessageMixin, UpdateView):
     def get_object(self):
         return self.request.user
 
-@method_decorator(csrf_exempt, name='dispatch')
-class ChatBot(View):
-    openai.api_key = settings.OPENAI_KEY
-    completion = openai.Completion()
+# @method_decorator(csrf_exempt, name='dispatch')
+# class ChatBot(View):
+#     openai.api_key = settings.OPENAI_KEY
+#     completion = openai.Completion()
 
-    start_sequence = "\nAI:"
-    restart_sequence = "\n\nPerson:"
-    session_prompt = "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly. Person: Hello, who are you? AI: I am an AI created by OpenAI. How can I help you today? Person: "
+#     start_sequence = "\nAI:"
+#     restart_sequence = "\n\nPerson:"
+#     session_prompt = "The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly. Person: Hello, who are you? AI: I am an AI created by OpenAI. How can I help you today? Person: "
 
-    def post(self, request, **kwargs):
-        print(request.POST)
-        incoming_msg = request.POST.get('Body')
-        chat_log = self.request.session.get('chat_log')
-        answer = self.ask(incoming_msg, chat_log)
-        self.request.session['chat_log'] = self.append_interaction_to_chat_log(
-            incoming_msg, answer, chat_log)
-        msg = MessagingResponse()
-        msg.message(answer)
-        return HttpResponse(msg)
+#     def post(self, request, **kwargs):
+#         print(request.POST)
+#         incoming_msg = request.POST.get('Body')
+#         chat_log = self.request.session.get('chat_log')
+#         answer = self.ask(incoming_msg, chat_log)
+#         self.request.session['chat_log'] = self.append_interaction_to_chat_log(
+#             incoming_msg, answer, chat_log)
+#         msg = MessagingResponse()
+#         msg.message(answer)
+#         return HttpResponse(msg)
 
-    def ask(self, question, chat_log=None):
-        prompt_text = f'{chat_log}{self.restart_sequence}: {question}{self.start_sequence}:'
-        response = openai.Completion.create(
-            engine="davinci",
-            prompt=prompt_text,
-            temperature=0.8,
-            max_tokens=1600,
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0.3,
-            stop=["\n"],
-        )
-        print(response)
-        story = response['choices'][0]['text']
-        return str(story)
+#     def ask(self, question, chat_log=None):
+#         prompt_text = f'{chat_log}{self.restart_sequence}: {question}{self.start_sequence}:'
+#         response = openai.Completion.create(
+#             engine="davinci",
+#             prompt=prompt_text,
+#             temperature=0.8,
+#             max_tokens=1600,
+#             top_p=1,
+#             frequency_penalty=0,
+#             presence_penalty=0.3,
+#             stop=["\n"],
+#         )
+#         print(response)
+#         story = response['choices'][0]['text']
+#         return str(story)
 
-    def append_interaction_to_chat_log(self, question, answer, chat_log=None):
-        if chat_log is None:
-            chat_log = self.session_prompt
-        return f'{chat_log}{self.restart_sequence} {question}{self.start_sequence}{answer}'
+#     def append_interaction_to_chat_log(self, question, answer, chat_log=None):
+#         if chat_log is None:
+#             chat_log = self.session_prompt
+#         return f'{chat_log}{self.restart_sequence} {question}{self.start_sequence}{answer}'
 
 
 @method_decorator(csrf_exempt, name='dispatch')
