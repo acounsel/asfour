@@ -124,8 +124,11 @@ class Contact(models.Model):
         ordering = ('first_name',)
 
     def __str__(self):
-        return '{0} {1}'.format(
-            self.first_name, self.last_name)
+        if self.first_name or self.last_name:
+            return '{0} {1}'.format(
+                self.first_name, self.last_name)
+        else:
+            return 'Unnamed Contact {}'.format(self.id)
 
     def save(self, *args, **kwargs):
         if '+' not in self.phone:
@@ -194,7 +197,6 @@ class Contact(models.Model):
             return 'Unnamed Contact {}'.format(self.id)
 
     def extract_email(self, input_string):
-        print('EXTRACING {}'.format(input_string))
         input_string = input_string.strip()
         email_regex = re.compile(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}')
         potential_emails = re.findall(email_regex, input_string)
@@ -204,9 +206,7 @@ class Contact(models.Model):
             return None
 
     def add_email(self, email_input):
-        print('EXTRACTING EMAIL')
         email = self.extract_email(email_input)
-        print('EMAIL CLEANED: {}'.format(email))
         if email:
             self.email = email
             self.has_email = True
