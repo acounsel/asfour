@@ -187,8 +187,11 @@ class Contact(models.Model):
             kwargs={'pk':self.id})
 
     def get_full_name(self):
-        return '{0} {1}'.format(
-            self.first_name, self.last_name)
+        if self.first_name or self.last_name:
+            return '{0} {1}'.format(
+                self.first_name, self.last_name)
+        else:
+            return 'Unnamed Contact {}'.format(self.id)
 
     def extract_email(self, input_string):
         print('EXTRACING {}'.format(input_string))
