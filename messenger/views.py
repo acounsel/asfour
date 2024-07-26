@@ -11,6 +11,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.contrib.messages.views import SuccessMessageMixin
+from django.db.models import F, Q, Value, CharField
+from django.db.models.functions import Concat
 from django.http import HttpResponse, StreamingHttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
@@ -198,6 +200,27 @@ class ContactList(ContactView, OrgListView):
 
 class ContactDetail(ContactView, OrgDetailView):
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        contact = self.get_object()
+        outbound = contact.messagelog_set.annotate(
+            model_type=Value(
+                'Outbound', output_field=CharField()),
+            msg_text=F('text')
+        ).values(
+            'id', 'timestamp', 'msg_text', 'model_type'
+        )
+        inbound = contact.response_set.annotate(
+            model_type=Value(
+                'Inbound', output_field=CharField()),
+            msg_text=F('body')
+        ).values(
+            'id', 'timestamp', 'msg_text', 'model_type'
+        )
+        context['message_list'] = outbound.union(
+            inbound).order_by('-timestamp')
+        return context
+
     def post(self, request, **kwargs):
         contact = self.get_object()
         if request.POST.get('body'):
@@ -214,8 +237,9 @@ class ContactCreate(ContactView, OrgCreateView):
 class ContactUpdate(ContactView, OrgUpdateView):
     pass
 
-class ContactDelete(ContactView, OrgDeleteView):
-    pass
+class ContactDelete(OrgDeleteView):
+    model = Contact
+    success_url = reverse_lazy('contact-list')
 
 class ContactImport(ContactList):
     template_name = 'messenger/contact_import.html'
