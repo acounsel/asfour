@@ -2,4 +2,45 @@
 {% block body %}
 <h1>Add Message</h1>
 {% include 'addins/form.html' %}
+<p id="charCount">Characters: 0</p>
+<p id="segmentCount">Twilio Segments: 0</p>
+
+{% endblock %}
+
+{% block javascript %}
+<script>
+$(document).ready(function () {
+    const $messageInput = $('#id_body');
+    const $charCount = $('#charCount');
+    const $segmentCount = $('#segmentCount');
+  
+    $messageInput.on('input', function () {
+      const message = $messageInput.val();
+      const charLength = message.length;
+  
+      // Update character count
+      $charCount.text(`Characters: ${charLength}`);
+  
+      // Calculate Twilio segments
+      const segments = calculateTwilioSegments(message);
+      $segmentCount.text(`Twilio Segments: ${segments}`);
+    });
+  
+    // Function to calculate Twilio SMS segments
+    function calculateTwilioSegments(text) {
+      const singleSegmentLimit = 160; // Standard SMS segment limit
+      const multipartSegmentLimit = 153; // Segment limit for concatenated messages
+  
+      const isGSM7 = /^[\x00-\x7F]*$/.test(text); // Check if text is GSM-7 encoded
+      const limit = isGSM7 ? singleSegmentLimit : 70; // Use GSM-7 or UCS-2 limits
+  
+      if (text.length <= limit) {
+        return 1; // Single segment
+      } else {
+        const segmentSize = isGSM7 ? multipartSegmentLimit : 67; // Adjust for multipart segments
+        return Math.ceil(text.length / segmentSize); // Calculate the number of segments
+      }
+    }
+});
+</script>
 {% endblock %}
