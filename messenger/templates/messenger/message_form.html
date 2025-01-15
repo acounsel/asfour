@@ -2,109 +2,11 @@
 {% load crispy_forms_tags %}
 {% block body %}
 <h1>Add Message</h1>
-<form class="mt-5 w-50 w-100-r" method="POST" novalidate enctype="multipart/form-data" action="{{ form_action }}">
-  {% csrf_token %}
-  <div class="form-group">
-    {{ form.name|as_crispy_field }}
-  </div>
-  <div class="form-group">
-    {{ form.method|as_crispy_field }}
-  </div>
-  <div class="form-group">
-    {{ form.body|as_crispy_field }}
-  </div>
-  <p id="charCount"><em>Characters:</em> 0</p>
-  <p id="segmentCount"><em>Twilio Segment Estimate:</em> 0</p>
-  <div class="form-group">
-    {{ form.attachment|as_crispy_field }}
-  </div>
-  <div id="conditional-fields" style="display: none;">
-    <div class="form-group">
-      {{ form.recording|as_crispy_field }}
-    </div>
-    <div class="form-group">
-        {{ form.request_for_response|as_crispy_field }}
-    </div>
-  </div>
-  <div class="form-group">
-    {{ form.tags|as_crispy_field }}
-    <a href="{% url 'tag-create' %}" target="_blank">+ Create New Tag</a>
-  </div>
-  <div class="form-group">
-    {{ form.contacts|as_crispy_field }}
-  </div>
-
-  {{ form.errors  }}
-  {% if add_all_bool %}
-    <div class="mb-4">
-    <input type="checkbox" value="add_all" name="add_all" class="mr-2">Add all contacts
-    </div>
-  {% endif %}
-  <input type="submit" value="Save" class="btn btn-primary px-4">
-  {% if form.instance %}
-    <a href="{{ form.instance.get_delete_url }}" class="btn btn-danger px-4 ml-5">Delete</a>
-  {% endif %}
-</form>
+{% include 'addins/messageform.html' %}
 
 
 {% endblock %}
 
 {% block javascript %}
-<script>
-$(document).ready(function () {
-  const $messageInput = $('#id_body');
-  const $charCount = $('#charCount');
-  const $segmentCount = $('#segmentCount');
-
-  $messageInput.on('input', function () {
-    const message = $messageInput.val();
-    const charLength = message.length;
-
-    // Update character count
-    $charCount.text(`Characters: ${charLength}`);
-
-    // Calculate Twilio segments
-    const segments = calculateTwilioSegments(message);
-    $segmentCount.text(`Twilio Segments: ${segments}`);
-  });
-
-  // Function to calculate Twilio SMS segments
-  function calculateTwilioSegments(text) {
-    const singleSegmentLimit = 160; // Standard SMS segment limit
-    const multipartSegmentLimit = 153; // Segment limit for concatenated messages
-
-    const isGSM7 = /^[\x00-\x7F]*$/.test(text); // Check if text is GSM-7 encoded
-    const limit = isGSM7 ? singleSegmentLimit : 70; // Use GSM-7 or UCS-2 limits
-
-    if (text.length <= limit) {
-      return 1; // Single segment
-    } else {
-      const segmentSize = isGSM7 ? multipartSegmentLimit : 67; // Adjust for multipart segments
-      return Math.ceil(text.length / segmentSize); // Calculate the number of segments
-    }
-  }
-});
-</script>
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const methodField = document.getElementById("id_method"); // Adjust if your "method" field has a different id
-    const conditionalFields = document.getElementById("conditional-fields");
-
-    function toggleConditionalFields() {
-      if (methodField.value === "voice") {
-        console.log('hi!');
-        conditionalFields.style.display = "block";
-      } else {
-        console.log('bye!');
-        conditionalFields.style.display = "none";
-      }
-    }
-
-    // Initial check when the page loads
-    toggleConditionalFields();
-
-    // Add event listener to the "method" field
-    methodField.addEventListener("change", toggleConditionalFields);
-  });
-</script>
+{% include 'addins/messageform_js.html' %}
 {% endblock %}
