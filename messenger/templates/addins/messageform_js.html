@@ -1,0 +1,62 @@
+<script>
+  $(document).ready(function () {
+    const $messageInput = $('#id_body');
+    const $charCount = $('#charCount');
+    const $segmentCount = $('#segmentCount');
+    // Function to calculate Twilio SMS segments
+    function calculateTwilioSegments(text) {
+      const singleSegmentLimit = 160; // Standard SMS segment limit
+      const multipartSegmentLimit = 153; // Segment limit for concatenated messages
+  
+      const isGSM7 = /^[\x00-\x7F]*$/.test(text); // Check if text is GSM-7 encoded
+      const limit = isGSM7 ? singleSegmentLimit : 70; // Use GSM-7 or UCS-2 limits
+  
+      if (text.length <= limit) {
+        return 1; // Single segment
+      } else {
+        const segmentSize = isGSM7 ? multipartSegmentLimit : 67; // Adjust for multipart segments
+        return Math.ceil(text.length / segmentSize); // Calculate the number of segments
+      }
+    }
+    // Function to update counts
+    function updateCounts() {
+      const message = $messageInput.val();
+      const charLength = message.length;
+  
+      // Update character count
+      $charCount.text(`Characters: ${charLength}`);
+  
+      // Update Twilio segment count
+      const segments = calculateTwilioSegments(message);
+      $segmentCount.text(`Twilio Segments: ${segments}`);
+    }
+  
+    // Attach event handler for input events
+    $messageInput.on('input', updateCounts);
+  
+    // Run on page load to update counts for pre-filled text
+    updateCounts();
+  });
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const methodField = document.getElementById("id_method"); // Adjust if your "method" field has a different id
+    const conditionalFields = document.getElementById("conditional-fields");
+
+    function toggleConditionalFields() {
+      if (methodField.value === "voice") {
+        console.log('hi!');
+        conditionalFields.style.display = "block";
+      } else {
+        console.log('bye!');
+        conditionalFields.style.display = "none";
+      }
+    }
+
+    // Initial check when the page loads
+    toggleConditionalFields();
+
+    // Add event listener to the "method" field
+    methodField.addEventListener("change", toggleConditionalFields);
+  });
+</script>

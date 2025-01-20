@@ -50,7 +50,7 @@
       <a class="btn btn-primary d-xl-inline-block px-5" href="{% url 'message-send' pk=message.id %}">{% if message.date_sent %}RE{% endif %}SEND</a>
     </div>
     <div id="id_messageEdit" class="collapse">
-      {% include 'addins/form.html' %}
+      {% include 'addins/messageform.html' %}
     </div>
     <div id="id_messageRecipients" class="collapse">
       <h3>Sending To:</h3>
@@ -70,7 +70,7 @@
             <th scope="row"><a href="{{ contact.get_absolute_url }}" class="text-dark d-block">{{ contact.first_name }}</a></th>
             <td><a href="{{ contact.get_absolute_url }}" class="text-dark d-block">{{ contact.last_name }}</a></td>
             <td><a href="{{ contact.get_absolute_url }}" class="text-dark d-block">{{ contact.phone }}</a></td>
-            <td><a href="{{ contact.get_absolute_url }}" class="text-dark d-block">{{ contact.tags.all }}</a></td>
+            <td><a href="{{ contact.get_absolute_url }}" class="text-dark d-block">{{ contact.tags.all|join:", " }}</a></td>
             <!-- <td><a href="{{ contact.get_absolute_url }}" class="text-dark d-block">{{ contact.status }}</a></td> -->
           </tr>
         {% endfor %}
@@ -123,4 +123,5 @@
     $( this ).addClass('active');
   });
 </script>
+{% include 'addins/messageform_js.html' %}
 {% endblock %}

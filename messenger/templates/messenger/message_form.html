@@ -1,5 +1,12 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
 {% block body %}
 <h1>Add Message</h1>
-{% include 'addins/form.html' %}
+{% include 'addins/messageform.html' %}
+
+
+{% endblock %}
+
+{% block javascript %}
+{% include 'addins/messageform_js.html' %}
 {% endblock %}

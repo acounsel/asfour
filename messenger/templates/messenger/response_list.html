@@ -20,7 +20,7 @@
         <th scope="row">{% if response.body %}<a href="{{ response.contact.get_absolute_url }}">{{ response.body }}</a>{% elif response.recording %}<a href="{{ response.recording }}">Voice Message</a>{% endif %}</th>
         <td><a href="{{ response.contact.get_absolute_url }}">{{ response.contact }}</a></td>
         <td><a href="{{ response.contact.get_absolute_url }}">{{ response.phone }}</a></td>
-        <td>{{ response.date_received }}</td>
+        <td>{{ response.timestamp }}</td>
       </tr>
       {% endfor %}
     </tbody>

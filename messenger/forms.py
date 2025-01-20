@@ -12,10 +12,22 @@ class MessageForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user_profile = kwargs.pop('user_profile')
         super(MessageForm, self).__init__(*args, **kwargs)
-        self.fields['tags'].queryset = Tag.objects.filter(
-            organization=user_profile.organization)
+        # self.fields['tags'].queryset = Tag.objects.filter(
+        #     organization=user_profile.organization)
         self.fields['contacts'].queryset = Contact.objects.filter(
             organization=user_profile.organization)
+        tags = Tag.objects.filter(is_active=True,
+            organization=user_profile.organization)
+        tag_choices = [
+            (tag.id, f"{tag.name} ({tag.contact_set.count()} contacts)")
+            for tag in tags
+        ]
+
+        self.fields['tags'] = forms.MultipleChoiceField(
+            choices=tag_choices,
+            widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
+            required=False,
+        )
 
 class OrganizationForm(forms.ModelForm):
     class Meta:

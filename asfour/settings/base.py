@@ -167,6 +167,11 @@ CACHES = {
     "default": {
         "BACKEND": "redis_cache.RedisCache",
         "LOCATION": os.environ.get('REDIS_URL'),
+        "OPTIONS": {
+            "SSL": {
+                "ssl_cert_reqs": 'CERT_NONE',
+            }
+        }
     }
 }
 

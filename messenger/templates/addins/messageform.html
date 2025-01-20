@@ -1,0 +1,44 @@
+{% load crispy_forms_tags %}
+<form class="mt-5 w-50 w-100-r" method="POST" novalidate enctype="multipart/form-data" action="{{ form_action }}">
+  {% csrf_token %}
+  <div class="form-group">
+    {{ form.name|as_crispy_field }}
+  </div>
+  <div class="form-group">
+    {{ form.method|as_crispy_field }}
+  </div>
+  <div class="form-group">
+    {{ form.body|as_crispy_field }}
+  </div>
+  <p id="charCount"><em>Characters:</em> 0</p>
+  <p id="segmentCount"><em>Twilio Segment Estimate:</em> 0</p>
+  <div class="form-group">
+    {{ form.attachment|as_crispy_field }}
+  </div>
+  <div id="conditional-fields" style="display: none;">
+    <div class="form-group">
+      {{ form.recording|as_crispy_field }}
+    </div>
+    <div class="form-group">
+        {{ form.request_for_response|as_crispy_field }}
+    </div>
+  </div>
+  <div class="form-group">
+    {{ form.tags|as_crispy_field }}
+    <a href="{% url 'tag-create' %}" target="_blank">+ Create New Tag</a>
+  </div>
+  <div class="form-group">
+    {{ form.contacts|as_crispy_field }}
+  </div>
+
+  {{ form.errors  }}
+  {% if add_all_bool %}
+    <div class="mb-4">
+    <input type="checkbox" value="add_all" name="add_all" class="mr-2">Add all contacts
+    </div>
+  {% endif %}
+  <input type="submit" value="Save" class="btn btn-primary px-4">
+  {% if form.instance %}
+    <a href="{{ form.instance.get_delete_url }}" class="btn btn-danger px-4 ml-5">Delete</a>
+  {% endif %}
+</form>
