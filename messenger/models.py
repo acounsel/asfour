@@ -119,6 +119,7 @@ class Contact(models.Model):
     is_unsubscribed = models.BooleanField(default=False)
     has_name = models.BooleanField(default=False)
     has_email = models.BooleanField(default=False)
+    date_added = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ('first_name',)

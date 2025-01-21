@@ -49,3 +49,21 @@ def update_status(current_task, current_stage, display_message):
             'message': display_message
         }
     )
+
+def export_contacts(queryset):
+    rows = [[
+        'First Name',
+        'Last Name',
+        'Email',
+        'Phone',
+        'Tags',
+    ],]
+    for i in queryset:
+        rows.append([
+            i.first_name,
+            i.last_name,
+            i.email,
+            i.phone,
+            ', '.join([tag.name for tag in i.tags.all()]),
+        ])
+    return rows
