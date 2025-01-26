@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="d-flex justify-content-between">
+  <h1>Invoicing</h1>
+  <h2><a href=""><i class="fas fa-download pr-4"></i></a></h2>
+</div>
+<div class="card mt-5 table-responsive">
+  <table class="table" data-sorting="true">
+    <thead>
+      <tr>
+        <th scope="col">Date</th>
+        <th scope="col">Messages Sent</th>
+        <th scope="col">Messages Received</th>
+        <th scope="col">Cost</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for invoice in invoice_list %}
+      <tr>
+        <th scope="row"><a href="{{ invoice.get_absolute_url }}">{{ invoice.date }}</a></th>
+        <td>{{ invoice.outgoing_msgs }}</td>
+        <td>{{ invoice.incoming_msgs }}</td>
+        <td>{{ invoice.get_cost_display }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

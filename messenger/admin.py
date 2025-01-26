@@ -2,13 +2,24 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
 
-from .models import (Autoreply, Contact, Message, MessageLog, 
-    Note, Organization, Response, Tag, UserProfile)
+from .models import (Autoreply, Contact, Invoice, Message, 
+    MessageLog, Note, Organization, Response, Tag, UserProfile)
 
 admin.site.register(Organization)
 
+@admin.register(Invoice)
+class TagAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'organization',
+        'date',
+        'raw_cost',
+    )
+    list_display_links = list_display
+    list_filter = ('organization', 'is_paid')
+
 @admin.register(Tag)
-class TagADmin(admin.ModelAdmin):
+class TagAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'name',
@@ -36,7 +47,6 @@ class UserProfileAdmin(admin.ModelAdmin):
         link = reverse('admin:auth_user_change', args=[obj.user.id])
         return format_html('<a href="{}">{}</a>', link, obj.user.username)
     link_to_user.short_description = 'Edit user'
-
 
 @admin.register(Contact)
 class ContactAdmin(admin.ModelAdmin):

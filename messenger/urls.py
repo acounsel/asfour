@@ -49,6 +49,10 @@ urlpatterns = [
             path('', views.AutoreplyUpdate.as_view(), name='autoreply-update'),
         ])),
     ])),
+    path('invoice/', include([
+        path('', views.InvoiceList.as_view(), name='invoice-list'),
+        path('<uuid>/', views.InvoiceDetail.as_view(), name='invoice-detail'),
+    ])),
     path('conference/<session_id>/', views.Conference.as_view(), name='conference-call'),
     # path('chatbot/', views.ChatBot.as_view(), name='chatbot'),
     path('status-callback/<int:pk>', views.StatusCallback.as_view(), name='status-callback'),

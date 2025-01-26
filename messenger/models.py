@@ -4,6 +4,7 @@ import re
 from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
+from uuid import uuid4
 
 from asfour.storage_backends import PrivateMediaStorage
 from asfour.storage_backends import PublicMediaStorage
@@ -60,8 +61,77 @@ class Organization(models.Model):
             contact.save()
             counter += 1
         return '{} contacts transfered'.format(counter)
-            
 
+class Invoice(models.Model):
+
+    uuid = models.UUIDField(primary_key=False, default=uuid4, editable=False)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    date = models.DateField(blank=True, null=True)
+    raw_cost = models.IntegerField(default=0)
+    adjusted_cost = models.IntegerField(default=0)
+    outgoing_msgs = models.IntegerField(default=0)
+    incoming_msgs = models.IntegerField(default=0)
+    date_paid = models.DateField(blank=True, null=True)
+    is_paid = models.BooleanField(default=False)
+    is_current = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ('-date',)
+
+    def __str__(self):
+            return '{} Invoice: {}'.format(self.organization.name, self.date)
+    
+    def get_cost(self):
+        return self.raw_cost * 1.05
+
+    def get_cost_display(self):
+        return '${}'.format(self.get_cost())
+    
+    def update(self):
+        account_sid, auth_token, phone = self.organization \
+        .get_credentials()
+        client = Client(account_sid, auth_token)
+        # usage_records = client.usage.records.list(
+        #     start_date=self.date,
+        #     end_date=datetime.date.today()
+        # )
+        self.raw_cost = self.update_cost(client)
+        self.incoming_msgs, self.outgoing_msgs = self.update_usage(
+            client)
+        self.save()
+    
+    def update_cost(self, client):
+        total_price = client.usage.records.this_month.list(
+            category='totalprice'
+        )
+        print(total_price)
+        for record in total_price:  
+            total_cost = record.price
+        return total_cost
+
+    def update_usage(self, client):
+        incoming = client.usage.records.list(
+            category='sms-inbound',
+            start_date=self.date,
+            end_date=datetime.date.today()
+        )
+        outgoing = client.usage.records.list(
+            category='sms-outbound',
+            start_date=self.date,
+            end_date=datetime.date.today()
+        )
+        # Initialize counters
+        # incoming = 0
+        # outgoing = 0
+        # Tally SMS counts
+        for record in incoming:
+            if record.category == 'sms-inbound':
+                incoming = int(record.count)
+        for record in outgoing:
+            if record.category == 'sms-outbound':
+                outgoing = int(record.count)
+        return incoming, outgoing
+    
 class UserProfile(models.Model):
 
     user = models.OneToOneField(User, 

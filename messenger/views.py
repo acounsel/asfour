@@ -27,8 +27,8 @@ from celery.result import AsyncResult
 from .decorators import validate_twilio_request
 from .forms import OrganizationForm, MessageForm
 from .functions import send_email
-from .models import (Autoreply, Contact, Message, MessageLog, 
-    Note, Organization, Response, Tag, UserProfile)
+from .models import (Autoreply, Contact, Invoice, Message, 
+    MessageLog, Note, Organization, Response, Tag, UserProfile)
 from .tasks import send_messages
 
 from twilio.twiml.voice_response import VoiceResponse, Dial
@@ -138,7 +138,6 @@ class Home(View):
 
 class OrgListView(LoginRequiredMixin, ListView):
     pass
-    
 
 class OrgDetailView(LoginRequiredMixin, 
     NoteMixin, DetailView):
@@ -156,6 +155,23 @@ class OrgCreateView(LoginRequiredMixin, CreateView):
 
 class OrgUpdateView(LoginRequiredMixin, UpdateView):
     pass
+
+class InvoiceList(LoginRequiredMixin, ListView):
+    model = Invoice
+
+    def get_queryset(self):
+        self.update_current_invoice()
+        return super().get_queryset()
+    
+    def update_current_invoice(self):
+        today = datetime.date.today()
+        first_of_month  = today.replace(day=1)
+        invoice, created = Invoice.objects.get_or_create(
+            organization=self.get_org(), date=first_of_month)
+        invoice.update()
+
+class InvoiceDetail(LoginRequiredMixin, DetailView):
+    model = Invoice
 
 class TagView(View):
     model = Tag
