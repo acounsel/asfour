@@ -18,9 +18,9 @@
       {% for invoice in invoice_list %}
       <tr>
         <th scope="row"><a href="{{ invoice.get_absolute_url }}">{{ invoice.date }}</a></th>
-        <td>{{ invoice.outgoing_msgs }}</td>
-        <td>{{ invoice.incoming_msgs }}</td>
-        <td>{{ invoice.get_cost_display }}</td>
+        <td><a href="{{ invoice.get_absolute_url }}">{{ invoice.outgoing_msgs }}</a></td>
+        <td><a href="{{ invoice.get_absolute_url }}">{{ invoice.incoming_msgs }}</a></td>
+        <td><a href="{{ invoice.get_absolute_url }}">{{ invoice.get_cost_display }}</a></td>
       </tr>
       {% endfor %}
     </tbody>

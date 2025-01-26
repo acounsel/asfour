@@ -173,6 +173,9 @@ class InvoiceList(LoginRequiredMixin, ListView):
 class InvoiceDetail(LoginRequiredMixin, DetailView):
     model = Invoice
 
+    def get_object(self):
+        return Invoice.objects.get(uuid=self.kwargs['uuid'])
+
 class TagView(View):
     model = Tag
     fields = ('name','is_active')

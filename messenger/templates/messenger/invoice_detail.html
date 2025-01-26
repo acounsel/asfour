@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="container my-5">
+  <div class="card" id="id_invoice">
+    <div class="card-header bg-danger">
+      <h2 class="text-center text-white mb-0">Invoice - {{ invoice.date|date:"F Y" }}</h2>
+    </div>
+    <div class="card-body">
+      <h5 class="card-title">Asfour Invoice Details</h5>
+      <p><strong>Invoice Number:</strong> INV-123456</p>
+      <p><strong>Account ID:</strong> ACC-987654</p>
+      <p><strong>Due Date:</strong> {{ invoice.get_due_date }}</p>
+      <p><strong>Status:</strong> <strong class="red">{{ invoice.get_status }}</strong></p>
+      <table class="table table-bordered mt-4">
+        <thead class="table-light">
+          <tr>
+            <th>Phone Number</th>
+            <th>Messages Sent</th>
+            <th>Messages Received</th>
+            <th>Cost Per Message</th>
+            <th>Total Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ invoice.organization.phone }}</td>
+            <td>{{ invoice.outgoing_msgs }}</td>
+            <td>{{ invoice.incoming_msgs }}</td>
+            <td>$0.75</td>
+            <td>{{ invoice.get_cost_display }}</td>
+          </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="4" class="text-end">Total</th>
+                <th>{{ invoice.get_cost_display }}</th>
+            </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+  {% if invoice.get_status != 'Paid' %}<a href="" class="btn btn-danger mt-3">Pay Now</a>{% endif %}
+  <button id="downloadPdf" class="btn btn-secondary mt-3">Download as PDF</button>
+</div>
+
+{% endblock %}
+{% block javascript %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+<script>
+    document.getElementById('downloadPdf').addEventListener('click', function () {
+        const element = document.querySelector('#id_invoice');
+        const options = {
+            margin: 1,
+            filename: 'Asfour_Invoice.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+        html2pdf().set(options).from(element).save();
+    });
+</script>
+{% endblock %}

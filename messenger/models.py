@@ -18,6 +18,7 @@ from .tasks import task_send_email, send_messages
 class Organization(models.Model):
 
     name = models.CharField(max_length=255)
+    account_id = models.IntegerField(default=1)
     twilio_api_key = models.CharField(
         max_length=255, blank=True)
     twilio_secret = models.CharField(
@@ -29,6 +30,7 @@ class Organization(models.Model):
         max_length=40, blank=True)
     forward_email = models.CharField(
         max_length=255, blank=True)
+    date_added = models.DateField(auto_now_add=True)
     url = models.URLField(max_length=255, blank=True)
 
     def __str__(self):
@@ -66,6 +68,7 @@ class Invoice(models.Model):
 
     uuid = models.UUIDField(primary_key=False, default=uuid4, editable=False)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    invoice_id = models.IntegerField(default=1)
     date = models.DateField(blank=True, null=True)
     raw_cost = models.IntegerField(default=0)
     adjusted_cost = models.IntegerField(default=0)
@@ -81,12 +84,26 @@ class Invoice(models.Model):
     def __str__(self):
             return '{} Invoice: {}'.format(self.organization.name, self.date)
     
+    def get_absolute_url(self):
+        return reverse('invoice-detail', kwargs={"uuid": self.uuid})
+    
+    def get_status(self):
+        if self.date_paid:
+            return 'Paid'
+        else:
+            return 'Unpaid'
+
     def get_cost(self):
-        return self.raw_cost * 1.05
+        return self.raw_cost * 1.1
 
     def get_cost_display(self):
-        return '${}'.format(self.get_cost())
+        return "${:,.2f}".format(self.get_cost())
     
+    def get_due_date(self):
+        return self.date.replace(
+            month=self.date.month + 1,
+            day = self.date.day + 9)
+
     def update(self):
         account_sid, auth_token, phone = self.organization \
         .get_credentials()
@@ -140,6 +157,7 @@ class UserProfile(models.Model):
         Organization, on_delete=models.CASCADE)
     phone = models.CharField(max_length=50, blank=True)
     is_admin = models.BooleanField(default=False)
+    date_added = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return self.user.get_full_name()
@@ -150,6 +168,7 @@ class Tag(models.Model):
     organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
+    date_added = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return self.name
