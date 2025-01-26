@@ -26,7 +26,7 @@ from django.utils.decorators import method_decorator
 from celery.result import AsyncResult
 from .decorators import validate_twilio_request
 from .forms import OrganizationForm, MessageForm
-from .functions import send_email
+from .functions import send_email, export_contacts
 from .models import (Autoreply, Contact, Invoice, Message, 
     MessageLog, Note, Organization, Response, Tag, UserProfile)
 from .tasks import send_messages
@@ -213,6 +213,19 @@ class ContactList(ContactView, OrgListView):
         queryset = super().get_queryset()
         return queryset.prefetch_related('tags', 
             'response_set', 'messagelog_set')
+
+class ContactExport(ContactList):
+
+    def get(self, request):
+        rows = export_contacts(self.get_queryset())
+        pseudo_buffer = Echo()
+        writer = csv.writer(pseudo_buffer)
+        response = StreamingHttpResponse(
+            (writer.writerow(row) for row in rows),
+            content_type="text/csv")
+        content_disp = 'attatchment;filename="contacts.csv"'
+        response['Content-Disposition'] = content_disp
+        return response
 
 class ContactDetail(ContactView, OrgDetailView):
     
