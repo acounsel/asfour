@@ -21,7 +21,7 @@
         <th scope="row"><a href="{{ message.message.get_absolute_url }}">{{ message.message }}</a></th>
         <td>{{ message.contact }}</td>
 <!--         <td>{{ message.sender }}</td> -->
-        <td>{{ message.date }}</td>
+        <td>{{ message.timestamp }}</td>
         <td>{{ message.get_status }}{% if message.error %}: {{ message.error }}{% endif %}</td>
       </tr>
       {% endfor %}

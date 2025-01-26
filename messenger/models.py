@@ -99,6 +99,12 @@ class Invoice(models.Model):
     def get_cost_display(self):
         return "${:,.2f}".format(self.get_cost())
     
+    def get_cost_per_msg(self):
+        total_msgs = self.outgoing_msgs + self.incoming_msgs
+        total_cost = self.get_cost()
+        cpm = total_cost / total_msgs
+        return "${:,.3f}".format(cpm)
+    
     def get_due_date(self):
         return self.date.replace(
             month=self.date.month + 1,
@@ -126,16 +132,20 @@ class Invoice(models.Model):
             total_cost = record.price
         return total_cost
 
-    def update_usage(self, client):
+    def update_usage(self, client, start_date=None, end_date=None):
+        if not start_date:
+            start_date = self.date
+        if not end_date:
+            end_date = datetime.date.today()
         incoming = client.usage.records.list(
             category='sms-inbound',
-            start_date=self.date,
-            end_date=datetime.date.today()
+            start_date=start_date,
+            end_date=end_date,
         )
         outgoing = client.usage.records.list(
             category='sms-outbound',
-            start_date=self.date,
-            end_date=datetime.date.today()
+            start_date=start_date,
+            end_date=end_date,
         )
         # Initialize counters
         # incoming = 0

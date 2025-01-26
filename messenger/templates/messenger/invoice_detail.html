@@ -9,8 +9,8 @@
       <h5 class="card-title">Asfour Invoice Details</h5>
       <p><strong>Invoice Number:</strong> INV-123456</p>
       <p><strong>Account ID:</strong> ACC-987654</p>
-      <p><strong>Due Date:</strong> {{ invoice.get_due_date }}</p>
-      <p><strong>Status:</strong> <strong class="red">{{ invoice.get_status }}</strong></p>
+      <p><strong>Status:</strong> <strong class="text-{{ invoice.get_status|lower }}">{{ invoice.get_status }}</strong></p>
+      <p><strong>Due By:</strong> {{ invoice.get_due_date }}</p>
       <table class="table table-bordered mt-4">
         <thead class="table-light">
           <tr>
@@ -26,7 +26,7 @@
             <td>{{ invoice.organization.phone }}</td>
             <td>{{ invoice.outgoing_msgs }}</td>
             <td>{{ invoice.incoming_msgs }}</td>
-            <td>$0.75</td>
+            <td>{{ invoice.get_cost_per_msg }}</td>
             <td>{{ invoice.get_cost_display }}</td>
           </tr>
         </tbody>
