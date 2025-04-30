@@ -110,7 +110,11 @@ class Invoice(models.Model):
             month=self.date.month + 1,
             day = self.date.day + 9)
 
-    def update(self):
+    def update(self, start_date=None, end_date=None):
+        if not start_date:
+            start_date = self.date
+        if not end_date:
+            end_date = datetime.date.today()
         account_sid, auth_token, phone = self.organization \
         .get_credentials()
         client = Client(account_sid, auth_token)
@@ -118,25 +122,26 @@ class Invoice(models.Model):
         #     start_date=self.date,
         #     end_date=datetime.date.today()
         # )
-        self.raw_cost = self.update_cost(client)
+        self.raw_cost = self.update_cost(client, start_date, end_date)
         self.incoming_msgs, self.outgoing_msgs = self.update_usage(
-            client)
+            client, start_date, end_date)
         self.save()
     
-    def update_cost(self, client):
-        total_price = client.usage.records.this_month.list(
-            category='totalprice'
+    def update_cost(self, client, start_date, end_date):
+        total_price = client.usage.records.list(
+            category='totalprice',
+            start_date=start_date,
+            end_date=end_date,
         )
+        # total_price = client.usage.records.this_month.list(
+        #     category='totalprice'
+        # )
         print(total_price)
         for record in total_price:  
             total_cost = record.price
         return total_cost
 
-    def update_usage(self, client, start_date=None, end_date=None):
-        if not start_date:
-            start_date = self.date
-        if not end_date:
-            end_date = datetime.date.today()
+    def update_usage(self, client, start_date, end_date):
         incoming = client.usage.records.list(
             category='sms-inbound',
             start_date=start_date,
