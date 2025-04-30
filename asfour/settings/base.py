@@ -3,7 +3,8 @@ import os
 
 from django.core.exceptions import ImproperlyConfigured
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib import parse
+
 #from .local_settings import BROKER_URL
 
 def get_env_variable(var_name):
@@ -108,8 +109,18 @@ WSGI_APPLICATION = 'asfour.wsgi.application'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
-CELERY_BROKER_URL = os.environ.get('REDIS_URL')
-CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL')
+REDIS_URL = os.environ.get('REDIS_URL')
+
+if REDIS_URL:
+    parsed_url = parse.urlparse(REDIS_URL)
+    query = dict(parse.parse_qsl(parsed_url.query))
+    query['ssl_cert_reqs'] = 'CERT_NONE'
+    new_query = parse.urlencode(query)
+
+    REDIS_URL = parse.urlunparse(parsed_url._replace(query=new_query))
+
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
