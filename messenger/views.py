@@ -13,7 +13,8 @@ from django.contrib.auth.models import User
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import F, Q, Value, CharField
 from django.db.models.functions import Concat
-from django.http import HttpResponse, StreamingHttpResponse
+from django.http import (HttpResponse, HttpResponseForbidden, 
+    StreamingHttpResponse)
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -71,6 +72,12 @@ class LoginRequiredMixin(LoginRequiredMixin):
             )
         )
         return super().form_valid(form)
+    
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.organization != self.get_org():
+            return HttpResponseForbidden()
+        return super().delete(request, *args, **kwargs)
 
 class AdminMixin(UserPassesTestMixin):
     login_url = '/login/'
@@ -123,17 +130,18 @@ class Home(View):
 
     def post(self, request, **kwargs):
         context = self.get_context_data()
-        email = send_email(
-            to='sarrabi@gmail.com',
-            subject='Account Requested',
-            content='{0} ({1}): {2}'.format(
-                request.POST.get('name'),
-                request.POST.get('email'),
-                request.POST.get('body')
+        if not request.POST.get('last_name'):
+            email = send_email(
+                to='sarrabi@gmail.com',
+                subject='Account Requested',
+                content='{0} ({1}): {2}'.format(
+                    request.POST.get('name'),
+                    request.POST.get('email'),
+                    request.POST.get('body')
+                )
             )
-        )
-        messages.success(request, 
-            'Request Received, Thank You!')
+            messages.success(request, 
+                'Request Received, Thank You!')
         return render(request, self.template_name, context)
 
 class OrgListView(LoginRequiredMixin, ListView):

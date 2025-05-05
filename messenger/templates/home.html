@@ -81,6 +81,7 @@
   <form style="max-width:500px;" class="px-3 mx-auto" method="POST">
     {% csrf_token %}
     <input type="text" name="name" placeholder="Name" class="form-control mb-4">
+    <input type="hidden" name="last_name" id="id_lastname">
     <input type="email" name="email" placeholder="Email" class="form-control mb-4">
     <input type="hidden" name="recaptcha" id="id_recaptcha">
     <textarea name="body" placeholder="What do you plan to use it for?" class="form-control mb-4"></textarea>
