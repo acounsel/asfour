@@ -141,7 +141,7 @@ class Home(View):
                 )
             )
             messages.success(request, 
-                'Request Received, Thank You!')
+                'Request received, thank you!')
         return render(request, self.template_name, context)
 
 class OrgListView(LoginRequiredMixin, ListView):
