@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="d-flex justify-content-between">
+  <h1>Contact List</h1>
+  <h2><a href="{% url 'contact-export' %}"><i class="fas fa-download pr-4"></i></a></h2>
+</div>
+<div class="card mt-5 table-responsive">
+  <table class="table" data-sorting="true">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Phone</th>
+        <th scope="col">Email</th>
+        <th scope="col">Tags</th>
+        <th scope="col">Messages Received</th>
+        <th scope="col">Messages Sent</th>
+        <th scope="col">Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for contact in contact_list %}
+      <tr>
+        <th scope="row"><a href="{{ contact.get_absolute_url }}">{% if contact.first_name or contact.last_name %}{{ contact.first_name }} {{ contact.last_name }}{% else %}No Name Provided{% endif %}</a></th>
+        <td><a href="{{ contact.get_absolute_url }}">{{ contact.phone }}</a></td>
+        <td><a href="{{ contact.get_absolute_url }}">{{ contact.email }}</a></td>
+        <td><a href="{{ contact.get_absolute_url }}">{{ contact.tags.all|join:", " }}</a></td>
+        <td class="text-center"><a href="{{ contact.get_absolute_url }}">{{ contact.response_set.count }}</a></td>
+        <td class="text-center"><a href="{{ contact.get_absolute_url }}">{{ contact.messagelog_set.count }}</a></td>
+        <td><a href="{{ contact.get_delete_url }}" target="_blank" class="btn btn-danger">Delete</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% include 'addins/paginator.html' %}
+{% endblock %}

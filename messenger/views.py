@@ -64,14 +64,18 @@ class LoginRequiredMixin(LoginRequiredMixin):
         return queryset.filter(organization=organization)
 
     def form_valid(self, form):
-        form.instance.organization = self.get_org()
-        messages.success(
-            self.request,
-            '{} Created'.format(
-                form.instance._meta.verbose_name.title()
+        try:
+            form.instance.organization = self.get_org()
+            messages.success(
+                self.request,
+                '{} Created'.format(
+                    form.instance._meta.verbose_name.title()
+                )
             )
-        )
+        except Exception as error:
+            print(error)
         return super().form_valid(form)
+        
     
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -155,7 +159,7 @@ class OrgDeleteView(LoginRequiredMixin, DeleteView):
     template_name = 'messenger/confirm_delete.html'
     
     def delete(self, request, *args, **kwargs):
-        messages.success(request, 'Succesfully Deleted')
+        messages.error(request, 'Succesfully Deleted')
         return super().delete(request, *args, **kwargs)
 
 class OrgCreateView(LoginRequiredMixin, CreateView):
@@ -224,6 +228,17 @@ class ContactList(ContactView, OrgListView):
         queryset = super().get_queryset()
         return queryset.prefetch_related('tags', 
             'response_set', 'messagelog_set')
+
+class CleanContacts(ContactList, OrgListView):
+    template_name = 'messenger/clean_contacts.html'
+    paginate_by = 500
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        responses = Response.objects.filter(
+            organization=self.get_org(),body__iexact='stop')
+        queryset = queryset.filter(response__in=responses)
+        return queryset
 
 class ContactExport(ContactList):
 
