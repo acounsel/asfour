@@ -49,7 +49,7 @@ def send_messages(msg_id, voice_uri=None, user_profile=None):
     verb = message.get_client_verb()
     client_action = getattr(client, verb)
     kwargs = message.get_kwargs(phone, voice_uri)
-    for contact in message.contacts.all():
+    for contact in message.contacts.filter(is_unsubscribed=False):
         try:
             kwargs['to'] = get_recipient(message, contact)
             msg = client_action.create(**kwargs)

@@ -728,7 +728,6 @@ class HarvestResponse(View):
 
     def post(self, request, **kwargs):
         resp = 200
-        print('starting')
         org = Organization.objects.get(
             id=self.kwargs.get('pk'))
         resp_kwargs, save = self.get_response_kwargs(
@@ -737,8 +736,14 @@ class HarvestResponse(View):
             response = Response.objects.create(**resp_kwargs)
             response.add_contact()
             if self.kwargs.get('medium') == 'message':
-                resp = self.sms_forward_and_respond(
-                    org, response)
+                if response.body.lower() == 'stop':
+                    try:
+                        contact = response.contact
+                        contact.is_unsubscribed = True
+                        contact.save()
+                else:
+                    resp = self.sms_forward_and_respond(
+                        org, response)
         if self.kwargs.get('medium') == 'voice':
             if request.POST.get('CallStatus') == 'completed':
                 response.forward_voice()
