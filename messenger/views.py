@@ -741,6 +741,8 @@ class HarvestResponse(View):
                         contact = response.contact
                         contact.is_unsubscribed = True
                         contact.save()
+                    except Exception as error:
+                        print(error)
                 else:
                     resp = self.sms_forward_and_respond(
                         org, response)
